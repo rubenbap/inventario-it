@@ -5,7 +5,7 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-in
 COPY . .
 RUN composer dump-autoload --classmap-authoritative --no-dev --no-scripts
 
-FROM serversideup/php:8.3-fpm-nginx
+FROM serversideup/php:8.6-fpm-nginx
 
 USER root
 RUN install-php-extensions intl bcmath
