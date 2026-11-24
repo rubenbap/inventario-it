@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventário IT — demonstração</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--card-shadow:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.06);--bg:#F5F6F8;--surface:#FFF;--surface2:#F9FAFB;--border:#E5E7EB;--divider:#F1F2F4;--text:#111827;--text2:#374151;--muted:#4B5563;--input:#D1D5DB;--accent:#2563EB;--accent-weak:#EFF6FF;--accent-border:#BFDBFE;--danger:#B91C1C;--warn:#C2410C;--ok:#15803D;--link:#1D4ED8;--nav:#111827;--nav-active:#1F2937;--nav-text:#D1D5DB;--chip:#F3F4F6;--chip-text:#374151;--shadow:0 10px 30px rgba(17,24,39,.18)}
+[data-theme=dark]{--card-shadow:0 1px 2px rgba(0,0,0,.3);--bg:#0B0F17;--surface:#151B26;--surface2:#111722;--border:#263041;--divider:#1F2733;--text:#F3F4F6;--text2:#D1D5DB;--muted:#9CA3AF;--input:#374151;--accent:#3B82F6;--accent-weak:#172338;--accent-border:#1E3A8A;--danger:#F87171;--warn:#FB923C;--ok:#4ADE80;--link:#93C5FD;--nav:#070A10;--nav-active:#1A2230;--nav-text:#CBD5E1;--chip:#263041;--chip-text:#E5E7EB;--shadow:0 10px 30px rgba(0,0,0,.5)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+a{color:var(--link);text-decoration:none;cursor:pointer}a:hover{text-decoration:underline}
+button,input,select,textarea{font:inherit;color:inherit}
+.shell{display:flex;flex-wrap:wrap;min-height:100vh}
+.side{flex:1 1 230px;max-width:100%;background:var(--nav);padding:20px 14px;display:flex;flex-direction:column;gap:2px}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:700;font-size:16px;padding:4px 10px 18px}
+.logo{width:32px;height:32px;border-radius:8px;background:var(--accent);display:grid;place-items:center}
+.side a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;color:var(--nav-text);font-weight:500;min-height:42px}
+.side a:hover{text-decoration:none;background:var(--nav-active)}
+.side a.on{background:var(--nav-active);color:#fff;font-weight:600}
+.side hr{border:0;height:1px;background:#374151;margin:12px 10px}
+.side .count{margin-left:auto;font-size:12px;color:#9CA3AF}
+main{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
+.top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:flex-end;padding:14px 28px;border-bottom:1px solid var(--border);background:var(--surface)}
+.top{gap:12px;justify-content:space-between;position:relative;z-index:20}
+.top-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.demo-badge{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--warn);border:1px solid currentColor;border-radius:999px;padding:3px 9px;opacity:.85}
+.menu-wrap{position:relative}
+.switcher,.account{display:flex;align-items:center;gap:10px;min-height:46px;padding:5px 12px 5px 6px;border:1px solid var(--border);border-radius:12px;background:var(--surface);cursor:pointer;text-align:left;max-width:360px}
+.switcher:hover,.account:hover{border-color:var(--input);background:var(--surface2)}
+.switcher[aria-expanded=true],.account[aria-expanded=true]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-weak)}
+.switcher-text{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.switcher-text b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.switcher-text .small{font-size:11px}
+.co-badge{display:inline-grid;place-items:center;min-width:34px;height:26px;padding:0 6px;border-radius:7px;background:var(--accent-weak);color:var(--link);font-size:11px;font-weight:700;letter-spacing:.03em;border:1px solid var(--accent-border);flex:none}
+.co-badge.lg{min-width:36px;height:34px;border-radius:9px}
+.avatar{display:inline-grid;place-items:center;border-radius:50%;color:#fff;font-weight:700;flex:none}
+.icon-btn{width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--border);border-radius:10px;background:var(--surface);cursor:pointer}
+.icon-btn:hover{background:var(--surface2);border-color:var(--input)}
+.menu{position:absolute;top:calc(100% + 8px);left:0;min-width:300px;max-width:min(360px,calc(100vw - 24px));background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:6px;z-index:40;display:flex;flex-direction:column}
+.menu.right{left:auto;right:0}
+.menu-item{display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:0;border-radius:8px;background:none;cursor:pointer;text-align:left;color:var(--text)}
+.menu-item:hover{background:var(--surface2);text-decoration:none}
+.menu-item.on{background:var(--accent-weak)}
+.menu-item .grow,.menu-head .grow{flex:1;display:flex;flex-direction:column;min-width:0}
+.menu-item .check{color:var(--accent);font-weight:700}
+.menu-ico{width:26px;text-align:center;font-weight:700;color:var(--muted)}
+.menu-sep{height:1px;background:var(--divider);margin:6px 4px}
+.menu-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:6px 10px 2px}
+.menu-head{display:flex;gap:12px;align-items:center;padding:10px}
+.content{padding:24px 28px 48px;display:flex;flex-direction:column;gap:18px}
+h1{margin:0;font-size:24px;letter-spacing:-.01em}h2{margin:0;font-size:16px}h3{margin:0;font-size:14px}
+.muted{color:var(--muted)}.small{font-size:12px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.between{justify-content:space-between}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.grid3{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.kpi{display:flex;flex-direction:column;gap:6px}.kpi .n{font-size:30px;font-weight:700}.kpi .l{font-size:13px;color:var(--muted);font-weight:500}
+.btn{min-height:40px;padding:0 14px;border-radius:8px;border:1px solid var(--input);background:var(--surface);color:var(--text);font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger{color:var(--danger)}
+.btn.sm{min-height:32px;padding:0 10px;font-size:12px}
+.btn.dashed{border-style:dashed;border-color:var(--accent);background:var(--accent-weak);color:var(--link)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+input,select,textarea{height:40px;padding:0 12px;border:1px solid var(--input);border-radius:8px;background:var(--surface);min-width:0}
+textarea{height:auto;padding:10px 12px;resize:vertical}
+input:focus,select:focus,textarea:focus,.btn:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--text2)}
+.form-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;padding:10px 12px;white-space:nowrap}
+td{padding:11px 12px;border-top:1px solid var(--divider);vertical-align:middle}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--surface2)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--chip);color:var(--chip-text);white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%}
+.tabs{display:inline-flex;flex-wrap:wrap;gap:4px;background:var(--chip);padding:4px;border-radius:10px}
+.tabs button{min-height:34px;padding:0 12px;border:0;border-radius:8px;background:transparent;font-weight:600;font-size:13px;cursor:pointer;color:var(--text)}
+.tabs button.on{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.tabs .c{color:var(--muted);font-weight:500;margin-left:4px}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;gap:2px;background:var(--chip)}
+.legend{display:flex;flex-wrap:wrap;gap:18px;font-size:13px;color:var(--text2)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.alert-list div{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--divider)}
+.kv{display:grid;grid-template-columns:minmax(120px,auto) 1fr;gap:8px 16px}
+.kv dt{color:var(--muted)}.kv dd{margin:0;font-weight:500;min-width:0;overflow-wrap:anywhere}
+.step{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;flex:none}
+.pick{text-align:left;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);cursor:pointer;display:flex;flex-direction:column;gap:3px}
+.pick.on{border:2px solid var(--accent);background:var(--accent-weak);padding:11px 13px}
+.pill{min-height:38px;padding:0 14px;border:1px solid var(--input);border-radius:999px;background:var(--surface);cursor:pointer;font-weight:500}
+.notice{padding:11px 14px;border-radius:10px;font-size:13px;background:var(--accent-weak);border:1px solid var(--accent-border)}
+.warnbox{padding:11px 14px;border-radius:10px;font-size:13px;background:rgba(185,28,28,.08);color:var(--danger);border:1px solid rgba(185,28,28,.25)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:6vh 16px;z-index:50;overflow-y:auto}
+.modal{width:min(560px,100%);background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);padding:22px;display:flex;flex-direction:column;gap:14px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 18px;border-radius:10px;box-shadow:var(--shadow);z-index:60;font-weight:500;max-width:90vw}
+.toast.err{background:#7F1D1D}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.content{max-width:1440px;width:100%;margin:0 auto}
+h1{font-size:26px;font-weight:700;letter-spacing:-.02em}
+.card{border-radius:14px;box-shadow:var(--card-shadow)}
+.btn{border-radius:9px;transition:background .12s,border-color .12s,box-shadow .12s}
+.btn.primary{box-shadow:0 1px 2px rgba(37,99,235,.25),inset 0 1px 0 rgba(255,255,255,.12)}
+.btn.primary:hover{filter:brightness(1.06)}
+.top{position:sticky;top:0;backdrop-filter:saturate(1.4) blur(8px);background:color-mix(in srgb,var(--surface) 88%,transparent)}
+.side{gap:1px;padding:20px 12px}
+.side .nav-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6B7280;padding:14px 12px 6px}
+.side a{position:relative;font-size:14px}
+.side a.on::before{content:"";position:absolute;left:-12px;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
+.side a svg{opacity:.85}
+th{background:var(--surface2);border-bottom:1px solid var(--border)}
+thead th:first-child{border-top-left-radius:8px}thead th:last-child{border-top-right-radius:8px}
+tr.click:hover td{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+td[colspan]{border-top:1px solid var(--border)}
+.chip.status{background:color-mix(in srgb,var(--c) 14%,transparent);color:color-mix(in srgb,var(--c) 75%,var(--text))}
+.chip.status .dot{background:var(--c)}
+.chip.todo{background:rgba(217,119,6,.14);color:#B45309}
+:root[data-theme=dark] .chip.todo{color:#FBBF24}
+.todobox{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:11px 14px;border-radius:10px;font-size:13px;background:rgba(217,119,6,.08);color:#B45309;border:1px solid rgba(217,119,6,.3)}
+:root[data-theme=dark] .todobox{color:#FBBF24}
+.kpi{position:relative}
+.kpi-ico{position:absolute;top:16px;right:16px;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 12%,transparent);color:var(--c)}
+.co-usage{display:flex;flex-direction:column;gap:6px}
+.co-row{display:grid;grid-template-columns:minmax(180px,260px) 1fr 44px;align-items:center;gap:14px;padding:10px 12px;border:1px solid transparent;border-radius:10px;background:none;cursor:pointer;text-align:left;color:var(--text)}
+.co-row:hover{background:var(--surface2)}
+.co-row.on{background:var(--accent-weak);border-color:var(--accent-border)}
+.co-name{display:flex;align-items:center;gap:10px;font-weight:600;min-width:0}
+.co-name span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.co-bar{height:12px;border-radius:6px;background:var(--chip);overflow:hidden;display:block}
+.co-bar>span{display:flex;gap:2px;height:100%}
+.co-bar i{display:block;height:100%}
+.co-total{text-align:right;font-size:16px}
+.tabs{border-radius:11px}
+.pick{transition:border-color .12s,background .12s}.pick:hover{border-color:var(--input)}
+.side{background:var(--surface);border-right:1px solid var(--border);padding:18px 12px;gap:1px}
+[data-theme=dark] .side{background:#0F1218}
+.side a.wordmark{display:block;padding:4px 10px 20px;font-size:20px;font-weight:700;letter-spacing:-.035em;color:var(--text);min-height:0;gap:0}
+.side a.wordmark span{color:var(--muted);font-weight:500}
+.side a.wordmark:hover{background:none;text-decoration:none}
+@media (min-width:701px){.side{position:sticky;top:0;height:100vh;overflow-y:auto;align-self:flex-start;flex:0 0 240px}}
+.side a:not(.wordmark){color:var(--text2);font-weight:500;font-size:14px;min-height:38px;padding:8px 10px;border-radius:7px;gap:11px}
+.side a:not(.wordmark) svg{color:var(--muted);opacity:1;width:17px;height:17px;stroke-width:1.75}
+.side a:not(.wordmark):hover{background:var(--surface2);color:var(--text)}
+.side a.on{background:var(--chip)!important;color:var(--text)!important;font-weight:600}
+.side a.on svg{color:var(--text)}
+.side a.on::before{display:none}
+.side .count{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.nav-sep{height:1px;background:var(--divider);margin:8px 10px}
+.side-bottom{margin-top:auto;display:flex;flex-direction:column;gap:1px;padding-top:12px}
+.side-foot{padding:6px 10px 8px;border-top:1px solid var(--border);padding-top:12px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.demo-dot{width:7px;height:7px;border-radius:50%;background:var(--warn)}
+@media (max-width:700px){.side-foot,.side a.wordmark,.nav-sep{display:none}.side{border-right:0;border-bottom:1px solid var(--border)}.co-row{grid-template-columns:1fr 44px}.co-bar{grid-column:1/-1;order:3}.demo-badge{display:none}.account .switcher-text{display:none}.switcher{max-width:none;flex:1}.menu{min-width:0;width:calc(100vw - 28px)}.menu.right{right:-50px}.content{padding:18px 14px 40px}.top{padding:12px 14px}.side{flex-direction:row;overflow-x:auto;padding:8px 10px;gap:4px}.side .brand,.side hr,.side .count{display:none}.side a{flex:none;min-height:40px}.top .demo{width:100%}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(() => {
+const KEY = 'inventario-it-demo-v2';
+const $ = (s, r = document) => r.querySelector(s);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const today = () => new Date().toISOString().slice(0, 10);
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
+const addMonths = (d, n) => { const x = new Date(d); x.setMonth(x.getMonth() + n); return x.toISOString().slice(0, 10); };
+const fmt = d => d ? d.slice(0, 10).split('-').reverse().join('/') : '—';
+const fmtDT = d => { if (!d) return '—'; const x = new Date(d); return x.toLocaleDateString('pt-PT') + ' ' + x.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }); };
+const money = v => v == null || v === '' ? '—' : Number(v).toLocaleString('pt-PT', { style: 'currency', currency: 'EUR' });
+const icons = {
+  painel: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
+  assets: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+  impressoras: '<path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M6 14h12v7H6z"/>',
+  servidores: '<rect x="3" y="3" width="18" height="7" rx="1.5"/><rect x="3" y="14" width="18" height="7" rx="1.5"/><path d="M7 6.5h.01M7 17.5h.01"/>',
+  linhas: '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>',
+  acessorios: '<path d="M12 2a6 6 0 0 0-6 6v6a6 6 0 0 0 12 0V8a6 6 0 0 0-6-6z"/><path d="M12 2v7"/>',
+  utilizadores: '<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M17 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6.3"/>',
+  empresas: '<path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 9h.01M15 9h.01M9 13h.01M15 13h.01M10 21v-4h4v4"/>',
+  importar: '<path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/>',
+  historico: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>'
+};
+const ico = (n, s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[n]}</svg>`;
+
+const KINDS = { device: 'Assets', phone: 'Assets', printer: 'Impressoras', server: 'Servidores e NAS', nas: 'Servidores e NAS', line: 'Linhas móveis' };
+
+function seed() {
+  const now = new Date().toISOString();
+  const d = {
+    seq: 1000, ui: { role: 1, company: 'all', theme: 'light', sessions: [1] },
+    companies: [{ id: 1, name: 'Construções Norte', code: 'CNT', counter: 0 }, { id: 2, name: 'Serviços Sul', code: 'SSL', counter: 0 }, { id: 3, name: 'Holding do Grupo', code: 'HLD', counter: 0 }],
+    statuses: [
+      { id: 1, name: 'Pronto', type: 'deployable', color: '#16A34A' }, { id: 2, name: 'Em preparação', type: 'pending', color: '#2563EB' },
+      { id: 3, name: 'Em reparação', type: 'pending', color: '#EA580C' }, { id: 4, name: 'Avariado', type: 'undeployable', color: '#B91C1C' },
+      { id: 5, name: 'Abatido', type: 'archived', color: '#6B7280' }
+    ],
+    categories: [
+      { id: 1, name: 'Portátil', kind: 'device' }, { id: 2, name: 'Desktop', kind: 'device' }, { id: 3, name: 'Monitor', kind: 'device' },
+      { id: 4, name: 'Telemóvel', kind: 'phone' }, { id: 5, name: 'Impressora', kind: 'printer' }, { id: 6, name: 'Servidor', kind: 'server' },
+      { id: 7, name: 'NAS', kind: 'nas' }, { id: 8, name: 'Linha móvel', kind: 'line' }
+    ],
+    manufacturers: ['Lenovo', 'Dell', 'HP', 'Apple', 'Samsung', 'OPPO', 'Motorola', 'Synology', 'QNAP', 'HPE', 'Operadora Móvel'].map((name, i) => ({ id: i + 1, name })),
+    models: [], locations: [], users: [], assets: [], accessories: [], accCheckouts: [], logs: []
+  };
+  const mf = n => d.manufacturers.find(m => m.name === n).id;
+  [['Lenovo', 'ThinkPad T14 Gen 4', 1], ['Lenovo', 'ThinkPad X1 Carbon G11', 1], ['Lenovo', 'ThinkCentre M70q', 2], ['Dell', 'Latitude 5440', 1], ['Dell', 'OptiPlex 7090', 2], ['Dell', 'P2723D', 3],
+   ['HP', 'EliteBook 840 G10', 1], ['Apple', 'MacBook Air M3', 1], ['Samsung', 'Galaxy A15', 4], ['Samsung', 'Galaxy A35 5G', 4], ['OPPO', 'A40', 4], ['Motorola', 'Moto G35 5G', 4],
+   ['HP', 'LaserJet M404dn', 5], ['HP', 'Color LaserJet Pro MFP 4302', 5], ['Dell', 'PowerEdge R650', 6], ['HPE', 'ProLiant ML350 Gen10', 6], ['Synology', 'RS2423+', 7], ['QNAP', 'TS-464', 7], ['Operadora Móvel', 'Cartão SIM', 8]]
+    .forEach(([b, name, cat], i) => d.models.push({ id: i + 1, manufacturer: mf(b), name, category: cat }));
+  [['Sede Porto', null], ['Sede Porto · Armazém IT', 1], ['Sede Porto · Bastidor A', null], ['Sede Porto · Bastidor B', null], ['Estaleiro Maia', 1], ['Escritório Lisboa', 2], ['Escritório Lisboa · Sala técnica', 2]]
+    .forEach(([name, company], i) => d.locations.push({ id: i + 1, name, company }));
+  d.users = [
+    { id: 1, first: 'Admin', last: 'Principal', company: null, login: true, role: 'admin', companies: [1, 2, 3], active: true, email: 'admin@example.com', password: 'admin123' },
+    { id: 2, first: 'Joana', last: 'Técnica', company: 1, login: true, role: 'admin', companies: [1, 2], active: true, email: 'tecnico@example.com', password: 'tecnico123' },
+    { id: 3, first: 'Luís', last: 'Leitura', company: 1, login: true, role: 'leitura', companies: [1], active: true, email: 'leitura@example.com', password: 'leitura123' },
+    { id: 11, first: 'Carlos', last: 'Admin', company: 2, login: true, role: 'admin', companies: [1, 2, 3], active: true, email: 'carlos@example.com', password: 'carlos123' },
+    { id: 4, first: 'Marta', last: 'Sousa', company: 1, active: true, location: 1 },
+    { id: 5, first: 'Pedro', last: 'Lima', company: 1, active: true, location: 5 },
+    { id: 6, first: 'Ana', last: 'Ribeiro', company: 1, active: true, location: 1 },
+    { id: 7, first: 'Rui', last: 'Costa', company: 2, active: true, location: 6 },
+    { id: 8, first: 'Sofia', last: 'Martins', company: 3, active: true, location: 1 },
+    { id: 9, first: 'Tiago', last: 'Nunes', company: 2, active: true, location: 6 },
+    { id: 10, first: 'Inês', last: 'Carvalho', company: 1, active: true, location: 5 }
+  ];
+  const add = (company, model, a = {}, assigned = null) => {
+    const c = d.companies.find(x => x.id === company); c.counter++;
+    const asset = { id: d.assets.length + 1, company, model, status: 1, tag: `${c.code}-${String(c.counter).padStart(5, '0')}`, name: '', serial: '', purchaseDate: '', cost: '', warranty: '', location: null, assigned, expected: '', notes: '', custom: {}, created: now, ...a };
+    d.assets.push(asset); return asset;
+  };
+  const u = (type, id) => ({ type, id });
+  const buy = { purchaseDate: '2025-03-10', warranty: 36, cost: 1089 };
+  add(1, 1, { ...buy, serial: 'PF4X1A2B', location: 1, expected: addDays(today(), -12) }, u('user', 6));
+  add(1, 4, { ...buy, serial: 'CN0R7T9K', cost: 980, location: 5 }, u('user', 5));
+  add(1, 1, { ...buy, serial: 'PF4X1A2C', location: 2 });
+  add(1, 1, { ...buy, serial: 'PF4X1A2D', location: 2 });
+  add(1, 6, { purchaseDate: addMonths(addDays(today(), 12), -36), warranty: 36, serial: 'CN0P27A1', cost: 279, location: 2 });
+  add(1, 5, { purchaseDate: addMonths(addDays(today(), 20), -36), warranty: 36, serial: 'CN07090X', cost: 720, location: 2, status: 3 });
+  add(3, 8, { serial: 'C02FK1ZQ', purchaseDate: '2025-09-01', warranty: 12, cost: 1299, location: 1 }, u('user', 8));
+  add(2, 7, { serial: '5CG3341ABC', purchaseDate: '2024-05-02', warranty: 24, cost: 1150, location: 6, status: 4, notes: 'Ecrã partido' });
+  add(1, 13, { serial: 'PHBQK12345', location: 1, custom: { ip: '10.0.1.30', hostname: 'PRT-PORTO01', tecnologia: 'Laser', cor: 'Mono', multifuncoes: 'Não' } }, u('location', 1));
+  add(2, 14, { serial: 'CNCRQ67890', location: 6, custom: { ip: '10.1.1.30', hostname: 'PRT-LIS01', tecnologia: 'Laser', cor: 'Cor', multifuncoes: 'Sim' } }, u('location', 6));
+  add(1, 15, { serial: 'SVCTAG01', name: 'SRV-DC01', location: 3, custom: { hostname: 'SRV-DC01', ip: '10.0.1.10' } }, u('location', 3));
+  add(1, 15, { serial: 'SVCTAG02', name: 'SRV-HV01', location: 3, custom: { hostname: 'SRV-HV01', ip: '10.0.1.20' } }, u('location', 3));
+  add(1, 17, { serial: 'SYN2423A', name: 'NAS-BKP01', location: 3, custom: { hostname: 'NAS-BKP01', ip: '10.0.1.50' } }, u('location', 3));
+  add(2, 16, { serial: 'CZJ0001X', name: 'SRV-LIS01', location: 7, custom: { hostname: 'SRV-LIS01', ip: '10.1.1.10' } }, u('location', 7));
+  add(2, 18, { serial: 'Q22BX0012', name: 'NAS-LIS01', location: 7, custom: { hostname: 'NAS-LIS01', ip: '10.1.1.50' } }, u('location', 7));
+  const phone = (c, m, imei, user, loc) => add(c, m, { serial: imei, location: loc }, u('user', user));
+  const line = (c, num, custom, assigned) => add(c, 19, { name: num.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3'), custom: { numero: num, ...custom } }, assigned);
+  const p1 = phone(1, 9, '354806116745921', 4, 1), p2 = phone(1, 11, '868450063326710', 6, 1), p3 = phone(2, 10, '359461108852236', 7, 6), p4 = phone(1, 12, '353918052267434', 10, 5);
+  line(1, '912345601', { tarifario: 'Biz Max', pin: '4821', puk: '30918274', ativacao: '2024-08-01', portado: 'Outra empresa do grupo', acessorios: 'Capa, Película' }, u('asset', p1.id));
+  line(1, '912345602', { tarifario: 'Biz Standard', pin: '7302', puk: '58210496', acessorios: 'Capa, Película' }, u('asset', p2.id));
+  line(2, '912345604', { tarifario: 'Biz Standard', pin: '1956', puk: '66402187', ativacao: '2024-12-10', acessorios: 'Capa, Película' }, u('asset', p3.id));
+  line(1, '912345605', { tarifario: 'Biz Standard', ativacao: '2025-07-31', acessorios: 'Capa, Película' }, u('asset', p4.id));
+  line(2, '912345606', { tarifario: 'Biz Standard' }, u('user', 9));
+  line(1, '912345607', { tarifario: 'Biz Standard' }, null);
+  d.accessories = [
+    { id: 1, company: 1, name: 'Rato Logitech M185', category: 'Periféricos', qty: 10, min: 3 },
+    { id: 2, company: 1, name: 'Dock USB-C Dell WD19', category: 'Docks', qty: 6, min: 5 },
+    { id: 3, company: 2, name: 'Cabo HDMI 2 m', category: 'Cabos', qty: 12, min: 10 },
+    { id: 4, company: 1, name: 'Teclado Logitech K120', category: 'Periféricos', qty: 8, min: 2 }
+  ];
+  const co = (acc, user, n = 1) => { for (let i = 0; i < n; i++) d.accCheckouts.push({ id: d.accCheckouts.length + 1, acc, user, at: now, inAt: null }); };
+  co(1, 4, 1); co(1, 5, 1); co(2, 4, 1); co(2, 6, 1); co(3, 7, 3);
+  const log = (action, itemType, itemId, targetType, targetId, mins, note) => d.logs.push({ id: d.logs.length + 1, at: new Date(Date.now() - mins * 60000).toISOString(), action, itemType, itemId, targetType, targetId, by: 2, note: note || '' });
+  log('checkout', 'asset', 2, 'user', 5, 2900); log('checkout', 'asset', 1, 'user', 6, 1500); log('create', 'asset', 8, null, null, 600);
+  log('checkout', 'accessory', 1, 'user', 5, 300); log('checkout', 'asset', 7, 'user', 8, 120, 'Portátil novo');
+  return d;
+}
+
+let db;
+try { db = JSON.parse(localStorage.getItem(KEY)) || seed(); } catch { db = seed(); }
+db.users.forEach(u => { if (u.role === 'tecnico') u.role = 'admin'; });
+db.imports ||= [];
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch {} };
+
+const st = { page: 'painel', detail: null, modal: null, toast: null, q: {}, filter: {}, revealed: {}, nf: null, userDetail: null };
+
+const ROLE_LABEL = { admin: 'Pode mexer', leitura: 'Só consulta' };
+const me = () => db.users.find(u => u.id === db.ui.role);
+const isAdmin = () => me().role === 'admin';
+const canWrite = () => isAdmin();
+const myCompanies = () => db.companies.map(c => c.id);
+const inScope = c => c == null ? true : (myCompanies().includes(c) && (db.ui.company === 'all' || db.ui.company === c));
+const company = id => db.companies.find(c => c.id === id);
+const model = id => db.models.find(m => m.id === id);
+const maker = id => db.manufacturers.find(m => m.id === id);
+const cat = id => db.categories.find(c => c.id === id);
+const status = id => db.statuses.find(s => s.id === id);
+const loc = id => db.locations.find(l => l.id === id);
+const user = id => db.users.find(u => u.id === id);
+const asset = id => db.assets.find(a => a.id === id);
+const uname = u => u ? `${u.first} ${u.last || ''}`.trim() : '—';
+const kindOf = a => cat(model(a.model).category).kind;
+const modelLabel = id => { const m = model(id); return m ? `${maker(m.manufacturer).name} ${m.name}` : '—'; };
+const warrantyEnd = a => a.purchaseDate && a.warranty ? addMonths(a.purchaseDate, +a.warranty) : '';
+const isAssigned = a => !!a.assigned;
+const meta = a => isAssigned(a) ? 'deployed' : status(a.status).type;
+const visibleAssets = () => db.assets.filter(a => !a.deleted && inScope(a.company));
+const nextId = () => ++db.seq;
+const targetName = t => { if (!t) return '—'; if (t.type === 'user') return uname(user(t.id)); if (t.type === 'location') return loc(t.id)?.name || '—'; const a = asset(t.id); return a ? (a.name || a.tag) : '—'; };
+const ownerOfLine = a => { if (!a.assigned) return null; if (a.assigned.type === 'user') return user(a.assigned.id); if (a.assigned.type === 'asset') { const p = asset(a.assigned.id); return p?.assigned?.type === 'user' ? user(p.assigned.id) : null; } return null; };
+const phoneOfLine = a => a.assigned?.type === 'asset' ? asset(a.assigned.id) : null;
+
+function log(action, itemType, itemId, target, note, extra) {
+  db.logs.push({ id: nextId(), at: new Date().toISOString(), action, itemType, itemId, targetType: target?.type || null, targetId: target?.id || null, by: me().id, note: note || '', ...extra });
+}
+function toast(msg, err) { st.toast = { msg, err }; render(); clearTimeout(toast.t); toast.t = setTimeout(() => { st.toast = null; render(); }, 3200); }
+function nextTag(companyId) { const c = company(companyId); c.counter++; return `${c.code}-${String(c.counter).padStart(5, '0')}`; }
+
+function statusChip(a) {
+  const s = status(a.status);
+  if (isAssigned(a)) return `<span class="chip status" style="--c:#2563EB"><span class="dot"></span>Atribuído</span>`;
+  return `<span class="chip status" style="--c:${s.color}"><span class="dot"></span>${esc(s.name)}</span>`;
+}
+function missing(a) {
+  const k = kindOf(a); if (k === 'line') return [];
+  const md = model(a.model), mk = db.manufacturers.find(m => m.id === md?.manufacturer), out = [];
+  if (!mk || norm(mk.name) === 'semmarca') out.push('marca');
+  if (!md || norm(md.name) === norm(cat(md.category)?.name) || ['desconhecido', 'generico', 'telemoveldesconhecido'].includes(norm(md.name))) out.push('modelo');
+  if (!a.serial) out.push(k === 'phone' ? 'IMEI' : 'n.º de série');
+  return out;
+}
+const todoChip = a => { const m = missing(a); return m.length ? ` <span class="chip todo" title="Falta: ${esc(m.join(', '))}">⚠ Por completar</span>` : ''; };
+const companyChip = id => `<span class="chip" title="${esc(company(id)?.name)}">${esc(company(id)?.code)}</span>`;
+
+const NAV = [['painel', 'Painel'], ['assets', 'Assets'], ['impressoras', 'Impressoras'], ['servidores', 'Servidores e NAS'], ['linhas', 'Linhas móveis'], ['acessorios', 'Acessórios'], ['utilizadores', 'Utilizadores'], ['empresas', 'Empresas'], ['historico', 'Histórico'], ['importar', 'Importar / Exportar']];
+const BOTTOM_NAV = ['importar'];
+const PAGE_OF_KIND = { device: 'assets', phone: 'assets', printer: 'impressoras', server: 'servidores', nas: 'servidores', line: 'linhas' };
+
+const initials = u => (u.first[0] + (u.last?.[0] || '')).toUpperCase();
+const avatarColor = u => ['#2563EB', '#7C3AED', '#0F766E', '#C2410C', '#BE185D', '#4D7C0F'][u.id % 6];
+const avatar = (u, size = 32) => `<span class="avatar" style="width:${size}px;height:${size}px;background:${avatarColor(u)};font-size:${Math.round(size * .4)}px" aria-hidden="true">${esc(initials(u))}</span>`;
+function companySwitcher() {
+  const mine = db.companies.filter(c => myCompanies().includes(c.id));
+  const cur = db.ui.company === 'all' ? null : company(db.ui.company);
+  const count = id => db.assets.filter(a => !a.deleted && (id === 'all' ? myCompanies().includes(a.company) : a.company === id)).length;
+  const item = (id, name, code, n) => { const on = db.ui.company === id; return `<button class="menu-item ${on ? 'on' : ''}" role="menuitemradio" aria-checked="${on}" data-act="pick-company" data-id="${id}"><span class="co-badge">${esc(code)}</span><span class="grow"><b>${esc(name)}</b><span class="small muted">${n} itens</span></span>${on ? '<span class="check">✓</span>' : ''}</button>`; };
+  return `<div class="menu-wrap">
+    <button class="switcher" data-act="menu" data-id="company" aria-haspopup="menu" aria-expanded="${st.menu === 'company'}">
+      <span class="co-badge lg">${cur ? esc(cur.code) : ico('empresas', 16)}</span>
+      <span class="switcher-text"><span class="small muted">Empresa</span><b>${cur ? esc(cur.name) : 'Todas as empresas'}</b></span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    ${st.menu === 'company' ? `<div class="menu" role="menu" aria-label="Escolher empresa">
+      ${item('all', 'Todas as empresas', '∗', count('all'))}
+      <div class="menu-sep"></div>
+      ${mine.map(c => item(c.id, c.name, c.code, count(c.id))).join('')}
+      ${isAdmin() ? '<div class="menu-sep"></div><a class="menu-item" href="#empresas" data-act="close-menu">' + ico('empresas', 16) + '<span class="grow">Gerir empresas</span></a>' : ''}
+    </div>` : ''}
+  </div>`;
+}
+function accountMenu() {
+  const u = me(), others = db.ui.sessions.map(user).filter(x => x && x.id !== u.id);
+  return `<div class="menu-wrap">
+    <button class="account" data-act="menu" data-id="account" aria-haspopup="menu" aria-expanded="${st.menu === 'account'}">${avatar(u)}<span class="switcher-text"><b>${esc(uname(u))}</b><span class="small muted">${ROLE_LABEL[u.role]}${others.length ? ` · ${others.length + 1} sessões` : ''}</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+    ${st.menu === 'account' ? `<div class="menu right" role="menu" aria-label="Conta">
+      <div class="menu-head">${avatar(u, 40)}<span class="grow"><b>${esc(uname(u))}</b><span class="small muted">${esc(u.email)}</span><span class="small muted">${ROLE_LABEL[u.role]}</span></span></div>
+      ${others.length ? `<div class="menu-sep"></div><div class="menu-label">Outras sessões abertas</div>${others.map(o => `<button class="menu-item" role="menuitem" data-act="switch-session" data-id="${o.id}">${avatar(o, 26)}<span class="grow"><b>${esc(uname(o))}</b><span class="small muted">${ROLE_LABEL[o.role]}</span></span><span class="small muted">Mudar</span></button>`).join('')}` : ''}
+      <div class="menu-sep"></div>
+      ${canWrite() ? `<a class="menu-item" role="menuitem" href="#tokens"><span class="menu-ico">⚿</span><span class="grow">Tokens da API</span></a>` : ''}
+      <button class="menu-item" role="menuitem" data-act="add-session"><span class="menu-ico">+</span><span class="grow">Entrar com outro login</span></button>
+      <button class="menu-item" role="menuitem" data-act="logout"><span class="menu-ico">⎋</span><span class="grow">Terminar sessão</span></button>
+      <div class="menu-sep"></div>
+      <button class="menu-item" role="menuitem" data-act="reset"><span class="menu-ico">↺</span><span class="grow">Repor dados de demonstração</span></button>
+    </div>` : ''}
+  </div>`;
+}
+
+function shell(inner) {
+  const counts = { assets: visibleAssets().filter(a => ['device', 'phone'].includes(kindOf(a))).length, impressoras: visibleAssets().filter(a => kindOf(a) === 'printer').length, servidores: visibleAssets().filter(a => ['server', 'nas'].includes(kindOf(a))).length, linhas: visibleAssets().filter(a => kindOf(a) === 'line').length, acessorios: db.accessories.filter(x => inScope(x.company)).length, utilizadores: db.users.filter(u => u.company == null ? isAdmin() || db.ui.company === 'all' : inScope(u.company)).length, empresas: db.ui.company === 'all' ? db.companies.filter(c => myCompanies().includes(c.id)).length : 1 };
+  const active = st.page === 'novo' ? 'assets' : st.page;
+  const navLink = (id, label) => `<a href="#${id}" class="${active === id ? 'on' : ''}" ${active === id ? 'aria-current="page"' : ''}>${ico(id)}${label}${counts[id] != null ? `<span class="count">${counts[id]}</span>` : ''}</a>`;
+  return `<div class="shell">
+  <nav class="side" aria-label="Menu principal">
+    <a class="wordmark" href="#painel" aria-label="Inventário IT, ir para o painel">inventário<span>.it</span></a>
+    ${NAV.filter(([id]) => !BOTTOM_NAV.includes(id) && (id !== 'empresas' || isAdmin())).map(([id, label]) => `${{ assets: '<div class="nav-sep"></div>', utilizadores: '<div class="nav-sep"></div>' }[id] || ''}${navLink(id, label)}`).join('')}
+    <div class="side-bottom"><div class="side-foot"><span class="demo-dot"></span>Demonstração · dados fictícios</div>
+    ${NAV.filter(([id]) => BOTTOM_NAV.includes(id)).map(([id, label]) => navLink(id, label)).join('')}</div>
+  </nav>
+  <main>
+    <div class="top">
+      ${companySwitcher()}
+      <div class="top-right">
+        <button class="icon-btn" data-act="theme" aria-label="${db.ui.theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}" title="${db.ui.theme === 'dark' ? 'Tema claro' : 'Tema escuro'}">${ico(db.ui.theme === 'dark' ? 'sun' : 'moon')}</button>
+        ${accountMenu()}
+      </div>
+    </div>
+    <div class="content">${inner}</div>
+  </main>
+</div>`;
+}
+
+function pagePainel() {
+  const all = visibleAssets().filter(a => status(a.status).type !== 'archived');
+  const assigned = all.filter(isAssigned).length;
+  const ready = all.filter(a => !isAssigned(a) && status(a.status).type === 'deployable').length;
+  const pending = all.filter(a => !isAssigned(a) && status(a.status).type === 'pending').length;
+  const broken = all.filter(a => status(a.status).type === 'undeployable').length;
+  const overdue = all.filter(a => isAssigned(a) && a.expected && a.expected < today());
+  const warr = all.filter(a => { const w = warrantyEnd(a); return w && w >= today() && w <= addDays(today(), 30); }).sort((a, b) => warrantyEnd(a).localeCompare(warrantyEnd(b)));
+  const low = db.accessories.filter(x => inScope(x.company) && accAvail(x) < x.min);
+  const logs = visibleLogs().slice(0, 8);
+  const todo = all.filter(a => missing(a).length);
+  const seg = (n, c) => n ? `<div style="flex:${n} 1 0;background:${c}"></div>` : '';
+  return `<div class="row between"><div><h1>Painel</h1><div class="muted">Resumo do inventário${db.ui.company === 'all' ? '' : ' · ' + esc(company(db.ui.company).name)}</div></div>
+    ${canWrite() ? `<div class="row"><a class="btn primary" href="#novo-asset">+ Novo asset</a></div>` : ''}</div>
+  <section class="grid" aria-label="Totais">
+    <div class="card kpi"><span class="kpi-ico" style="--c:#2563EB">${ico('assets')}</span><span class="l">Assets ativos</span><span class="n">${all.length}</span><span class="small muted">inclui impressoras, servidores e linhas</span></div>
+    <div class="card kpi"><span class="kpi-ico" style="--c:#7C3AED">${ico('utilizadores')}</span><span class="l">Atribuídos</span><span class="n">${assigned}</span><span class="small muted">${all.length ? Math.round(assigned / all.length * 100) : 0}% do total</span></div>
+    <div class="card kpi"><span class="kpi-ico" style="--c:#16A34A"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span class="l">Prontos a atribuir</span><span class="n">${ready}</span><a class="small" data-act="go-filter" data-page="assets" data-f="rtd">ver lista</a></div>
+    <div class="card kpi"><span class="kpi-ico" style="--c:#DC2626"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></span><span class="l">Em reparação / avariados</span><span class="n" style="color:${broken ? 'var(--danger)' : 'inherit'}">${pending + broken}</span><span class="small muted">${plural(broken, 'avariado', 'avariados')}</span></div>
+  </section>
+  ${todo.length ? `<div class="todobox"><span>⚠ <b>${plural(todo.length, 'equipamento', 'equipamentos')} por completar</b>: falta a marca, o modelo ou o n.º de série.</span><a class="btn sm" data-act="go-filter" data-page="assets" data-f="todo">Ver e completar</a></div>` : ''}
+  <section class="card" aria-label="Por estado" style="display:flex;flex-direction:column;gap:12px">
+    <h2>Assets por estado</h2>
+    <div class="bar" role="img" aria-label="Atribuídos ${assigned}, prontos ${ready}, pendentes ${pending}, avariados ${broken}">${seg(assigned, 'var(--accent)')}${seg(ready, '#16A34A')}${seg(pending, '#EA580C')}${seg(broken, '#B91C1C')}</div>
+    <div class="legend"><span><i class="dot" style="background:var(--accent)"></i>Atribuídos <b>${assigned}</b></span><span><i class="dot" style="background:#16A34A"></i>Prontos <b>${ready}</b></span><span><i class="dot" style="background:#EA580C"></i>Em preparação/reparação <b>${pending}</b></span><span><i class="dot" style="background:#B91C1C"></i>Avariados <b>${broken}</b></span></div>
+  </section>
+  ${companyUsageCard()}
+  <div class="grid3">
+    <section class="card alert-list"><div style="border:0;padding-top:0"><h2>Devoluções em atraso</h2><span class="chip">${overdue.length}</span></div>
+      ${overdue.map(a => `<div><span><a data-act="open-asset" data-id="${a.id}">${esc(a.tag)}</a> · ${esc(modelLabel(a.model))}<br><span class="small muted">${esc(targetName(a.assigned))}</span></span><span style="color:var(--danger);font-weight:600;white-space:nowrap">${Math.round((new Date(today()) - new Date(a.expected)) / 864e5)} dias</span></div>`).join('') || '<div class="muted">Nada em atraso.</div>'}</section>
+    <section class="card alert-list"><div style="border:0;padding-top:0"><h2>Stock baixo de acessórios</h2><span class="chip">${low.length}</span></div>
+      ${low.map(x => `<div><span>${esc(x.name)}</span><span class="small muted">${accAvail(x)} disp. / mín. ${x.min}</span></div>`).join('') || '<div class="muted">Stock em ordem.</div>'}</section>
+    <section class="card alert-list"><div style="border:0;padding-top:0"><h2>Garantias a terminar (30 dias)</h2><span class="chip">${warr.length}</span></div>
+      ${warr.map(a => `<div><span><a data-act="open-asset" data-id="${a.id}">${esc(a.tag)}</a> · ${esc(modelLabel(a.model))}</span><span class="small muted">${fmt(warrantyEnd(a))}</span></div>`).join('') || '<div class="muted">Nenhuma garantia a terminar.</div>'}</section>
+  </div>
+  <section class="card"><div class="row between"><h2>Atividade recente</h2><a href="#historico">Histórico completo</a></div>${logTable(logs)}</section>`;
+}
+
+function companyUsageCard() {
+  const list = db.companies.filter(c => myCompanies().includes(c.id)).map(c => {
+    const as = db.assets.filter(a => !a.deleted && a.company === c.id && status(a.status).type !== 'archived');
+    const k = kinds => as.filter(a => kinds.includes(kindOf(a))).length;
+    const row = { c, assets: k(['device', 'phone']), printers: k(['printer']), servers: k(['server', 'nas']), lines: k(['line']) };
+    row.total = row.assets + row.printers + row.servers + row.lines;
+    return row;
+  }).sort((a, b) => b.total - a.total);
+  const max = Math.max(1, ...list.map(r => r.total));
+  const parts = [['assets', 'var(--accent)', 'Assets'], ['printers', '#8B5CF6', 'Impressoras'], ['servers', '#14B8A6', 'Servidores/NAS'], ['lines', '#F97316', 'Linhas']];
+  return `<section class="card" aria-label="Por empresa" style="display:flex;flex-direction:column;gap:14px">
+    <div class="row between"><h2>Por empresa</h2><div class="legend">${parts.map(([, c, l]) => `<span><i class="dot" style="background:${c}"></i>${l}</span>`).join('')}</div></div>
+    <div class="co-usage">${list.map(r => `<button class="co-row ${db.ui.company === r.c.id ? 'on' : ''}" data-act="set-company" data-id="${db.ui.company === r.c.id ? 'all' : r.c.id}" title="${esc(parts.map(([k, , l]) => `${l}: ${r[k]}`).join(' · '))}">
+      <span class="co-name"><span class="co-badge">${esc(r.c.code)}</span><span>${esc(r.c.name)}</span></span>
+      <span class="co-bar"><span style="width:${r.total ? Math.max(3, r.total / max * 100) : 0}%">${parts.map(([k, c]) => r[k] ? `<i style="flex:${r[k]} 1 0;background:${c}"></i>` : '').join('')}</span></span>
+      <b class="co-total">${r.total}</b></button>`).join('')}</div>
+  </section>`;
+}
+
+function visibleLogs() {
+  return db.logs.filter(l => { const c = logCompany(l); return c == null ? isAdmin() || db.ui.company === 'all' : inScope(c); }).sort((a, b) => b.at.localeCompare(a.at));
+}
+function logCompany(l) { if (l.itemType === 'asset') return asset(l.itemId)?.company; if (l.itemType === 'accessory') return db.accessories.find(x => x.id === l.itemId)?.company; if (l.itemType === 'user') return user(l.itemId)?.company; return null; }
+const ACTIONS = { create: ['Criado', ''], update: ['Editado', ''], checkout: ['Check-out', 'blue'], 'checkin from': ['Check-in', 'green'], transfer: ['Mudou de empresa', 'orange'], delete: ['Apagado', 'red'], 'view encrypted': ['Viu PIN/PUK', 'orange'] };
+function logTable(logs) {
+  if (!logs.length) return '<div class="empty">Ainda sem atividade.</div>';
+  const colors = { blue: 'var(--accent)', green: '#16A34A', orange: '#EA580C', red: '#B91C1C', '': 'var(--muted)' };
+  const item = l => { if (l.itemType === 'asset') { const a = asset(l.itemId); return a ? `<a data-act="open-asset" data-id="${a.id}">${esc(a.tag)}</a> · ${esc(a.name || modelLabel(a.model))}` : '—'; } if (l.itemType === 'accessory') return esc(db.accessories.find(x => x.id === l.itemId)?.name); if (l.itemType === 'user') return esc(uname(user(l.itemId))); if (l.itemType === 'manufacturer') return 'Marca ' + esc(maker(l.itemId)?.name); if (l.itemType === 'company') return 'Empresa ' + esc(company(l.itemId)?.name || l.note); return '—'; };
+  return `<div class="tablebox"><table style="min-width:680px"><thead><tr><th>Quando</th><th>Ação</th><th>Item</th><th>Destino</th><th>Por</th><th>Nota</th></tr></thead><tbody>
+  ${logs.map(l => { const [lab, col] = ACTIONS[l.action] || [l.action, '']; return `<tr><td class="muted" style="white-space:nowrap">${fmtDT(l.at)}</td><td><span class="chip"><span class="dot" style="background:${colors[col]}"></span>${esc(lab)}${l.qty > 1 ? ' ×' + l.qty : ''}</span></td><td>${item(l)}</td><td>${l.targetType ? esc(targetName({ type: l.targetType, id: l.targetId })) : (l.from || l.to ? esc(`${l.from} → ${l.to}`) : '—')}</td><td class="muted">${esc(uname(user(l.by)))}</td><td class="muted">${esc(l.note)}</td></tr>`; }).join('')}</tbody></table></div>`;
+}
+
+function searchBox(page, placeholder) {
+  return `<label class="sr" for="q-${page}">Pesquisar</label><input id="q-${page}" type="search" data-input="q" data-page="${page}" value="${esc(st.q[page] || '')}" placeholder="${esc(placeholder)}" style="width:280px;max-width:100%">`;
+}
+function matches(page, ...fields) { const q = (st.q[page] || '').trim().toLowerCase(); return !q || fields.some(f => String(f ?? '').toLowerCase().includes(q)); }
+function tabs(page, defs) {
+  const cur = st.filter[page] || defs[0][0];
+  return `<div class="tabs" role="group" aria-label="Filtrar">${defs.map(([id, label, n]) => `<button data-act="tab" data-page="${page}" data-id="${id}" class="${cur === id ? 'on' : ''}" aria-pressed="${cur === id}">${label}<span class="c">${n}</span></button>`).join('')}</div>`;
+}
+
+const allMine = () => db.assets.filter(a => !a.deleted && myCompanies().includes(a.company));
+function companyBar(items, key = x => x.company) {
+  const btn = (id, label, n) => { const on = db.ui.company === id; return `<button class="btn sm ${on ? 'primary' : ''}" data-act="set-company" data-id="${id}" aria-pressed="${on}">${esc(label)} · ${n}</button>`; };
+  return `<div class="row" role="group" aria-label="Empresa"><span class="small muted">Empresa:</span>${btn('all', 'Todas', items.length)}${db.companies.filter(c => myCompanies().includes(c.id)).map(c => btn(c.id, c.name, items.filter(x => key(x) === c.id).length)).join('')}</div>`;
+}
+function grouped(rows, headers, rowFn, minWidth, summary = list => `${list.length} registo${list.length === 1 ? '' : 's'}`, key = x => x.company) {
+  const groups = db.companies.filter(c => rows.some(r => key(r) === c.id)).map(c => [c, rows.filter(r => key(r) === c.id)]);
+  const none = rows.filter(r => key(r) == null);
+  if (none.length) groups.push([{ name: 'Sem empresa', code: '—' }, none]);
+  if (!groups.length) return '<div class="empty">Nada encontrado.</div>';
+  return `<div class="tablebox"><table style="min-width:${minWidth}px"><thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+  ${groups.map(([c, list]) => `<tbody><tr><td colspan="${headers.length}" style="background:var(--surface2);font-weight:700;padding:10px 12px">${esc(c.name)} <span class="chip" style="margin-left:6px">${esc(c.code)}</span> <span class="muted small" style="margin-left:6px">${summary(list)}</span></td></tr>${list.map(rowFn).join('')}</tbody>`).join('')}</table></div>`;
+}
+const plural = (n, s, p) => `${n} ${n === 1 ? s : p}`;
+
+function pageAssets() {
+  const kinds = a => ['device', 'phone'].includes(kindOf(a));
+  const base = visibleAssets().filter(kinds);
+  const F = { all: a => status(a.status).type !== 'archived', rtd: a => !isAssigned(a) && status(a.status).type === 'deployable', deployed: isAssigned, pending: a => !isAssigned(a) && status(a.status).type === 'pending', broken: a => status(a.status).type === 'undeployable', archived: a => status(a.status).type === 'archived', todo: a => status(a.status).type !== 'archived' && missing(a).length > 0 };
+  const cur = st.filter.assets || 'all';
+  const rows = base.filter(F[cur]).filter(a => matches('assets', a.tag, a.name, a.serial, modelLabel(a.model), cat(model(a.model).category).name, targetName(a.assigned), a.notes, company(a.company).name));
+  return `<div class="row between"><div><h1>Assets</h1><div class="muted">Portáteis, desktops, monitores e telemóveis, por empresa</div></div>${canWrite() ? '<a class="btn primary" href="#novo-asset">+ Novo asset</a>' : ''}</div>
+  <section class="card" style="display:flex;flex-direction:column;gap:12px">
+    <div class="row between">${tabs('assets', [['all', 'Todos', base.filter(F.all).length], ['rtd', 'Prontos', base.filter(F.rtd).length], ['deployed', 'Atribuídos', base.filter(F.deployed).length], ['pending', 'Preparação/reparação', base.filter(F.pending).length], ['broken', 'Avariados', base.filter(F.broken).length], ['archived', 'Arquivados', base.filter(F.archived).length], ...(base.some(F.todo) ? [['todo', '⚠ Por completar', base.filter(F.todo).length]] : [])])}${searchBox('assets', 'Tag, S/N, modelo, pessoa…')}</div>
+    ${companyBar(allMine().filter(kinds).filter(F[cur]))}
+    ${grouped(rows, ['Tag', 'Modelo', 'Categoria', 'S/N / IMEI', 'Estado', 'Atribuído a', 'Localização'], a => `<tr class="click" data-act="open-asset" data-id="${a.id}"><td><a class="mono" style="font-weight:600">${esc(a.tag)}</a>${todoChip(a)}${a.name ? `<div class="small muted">${esc(a.name)}</div>` : ''}</td><td>${esc(modelLabel(a.model))}</td><td>${esc(cat(model(a.model).category).name)}</td><td class="mono">${esc(a.serial || '—')}</td><td>${statusChip(a)}</td><td>${esc(targetName(a.assigned))}</td><td>${esc(loc(a.location)?.name || '—')}</td></tr>`, 900, l => `${plural(l.length, 'asset', 'assets')} · ${plural(l.filter(isAssigned).length, 'atribuído', 'atribuídos')}`)}
+  </section>`;
+}
+
+function pageImpressoras() {
+  const kinds = a => kindOf(a) === 'printer';
+  const rows = visibleAssets().filter(kinds).filter(a => matches('impressoras', a.tag, a.custom.hostname, a.custom.ip, modelLabel(a.model), targetName(a.assigned), company(a.company).name));
+  return `<div class="row between"><div><h1>Impressoras</h1><div class="muted">Sem tinteiros nem toners: só as impressoras, por empresa</div></div>${canWrite() ? '<button class="btn primary" data-act="new-kind" data-kind="printer">+ Registar impressora</button>' : ''}</div>
+  <section class="card" style="display:flex;flex-direction:column;gap:12px"><div class="row between">${companyBar(allMine().filter(kinds))}${searchBox('impressoras', 'Nome, IP, modelo…')}</div>
+  ${grouped(rows, ['Nome', 'Modelo', 'IP', 'Tipo', 'Localização', 'Estado'], a => `<tr class="click" data-act="open-asset" data-id="${a.id}"><td><a class="mono" style="font-weight:600">${esc(a.custom.hostname || a.tag)}</a>${todoChip(a)}<div class="small muted">${esc(a.tag)}</div></td><td>${esc(modelLabel(a.model))}</td><td class="mono">${esc(a.custom.ip || '—')}</td><td>${esc([a.custom.tecnologia, a.custom.cor, a.custom.multifuncoes === 'Sim' ? 'Multifunções' : ''].filter(Boolean).join(' · ') || '—')}</td><td>${esc(targetName(a.assigned) !== '—' ? targetName(a.assigned) : loc(a.location)?.name || '—')}</td><td>${statusChip(a)}</td></tr>`, 820, l => plural(l.length, 'impressora', 'impressoras'))}</section>`;
+}
+
+function pageServidores() {
+  const kinds = a => ['server', 'nas'].includes(kindOf(a));
+  const base = visibleAssets().filter(kinds);
+  const cur = st.filter.servidores || 'all';
+  const byType = a => cur === 'all' || kindOf(a) === cur;
+  const rows = base.filter(byType).filter(a => matches('servidores', a.name, a.custom.hostname, a.custom.ip, modelLabel(a.model), company(a.company).name));
+  return `<div class="row between"><div><h1>Servidores e NAS</h1><div class="muted">Nome, tipo, modelo, IP e localização, por empresa</div></div>${canWrite() ? '<button class="btn primary" data-act="new-kind" data-kind="server">+ Registar servidor ou NAS</button>' : ''}</div>
+  <section class="card" style="display:flex;flex-direction:column;gap:12px"><div class="row between">${tabs('servidores', [['all', 'Todos', base.length], ['server', 'Servidores', base.filter(a => kindOf(a) === 'server').length], ['nas', 'NAS', base.filter(a => kindOf(a) === 'nas').length]])}${searchBox('servidores', 'Nome ou IP…')}</div>
+  ${companyBar(allMine().filter(kinds).filter(byType))}
+  ${grouped(rows, ['Nome', 'Tipo', 'Modelo', 'IP', 'Localização'], a => `<tr class="click" data-act="open-asset" data-id="${a.id}"><td><a class="mono" style="font-weight:600">${esc(a.custom.hostname || a.name || a.tag)}</a>${todoChip(a)}</td><td><span class="chip">${kindOf(a) === 'nas' ? 'NAS' : 'Servidor'}</span></td><td>${esc(modelLabel(a.model))}</td><td class="mono">${esc(a.custom.ip || '—')}</td><td>${esc(loc(a.location)?.name || '—')}</td></tr>`, 700, l => `${plural(l.filter(a => kindOf(a) === 'server').length, 'servidor', 'servidores')} · ${l.filter(a => kindOf(a) === 'nas').length} NAS`)}</section>`;
+}
+
+function pinCell(a) {
+  if (!a.custom.pin && !a.custom.puk) return '<span class="muted">—</span>';
+  const open = st.revealed[a.id];
+  const txt = open ? `${a.custom.pin || '—'} / ${a.custom.puk || '—'}` : '•••• / ••••••••';
+  return `<span class="row" style="gap:8px;flex-wrap:nowrap"><span class="mono">${esc(txt)}</span>${me().role !== 'leitura' ? `<button class="btn sm" data-act="reveal" data-id="${a.id}" aria-label="${open ? 'Esconder' : 'Mostrar'} PIN e PUK">${open ? 'Esconder' : 'Mostrar'}</button>` : ''}</span>`;
+}
+
+function pageLinhas() {
+  const kinds = a => kindOf(a) === 'line';
+  const base = visibleAssets().filter(kinds);
+  const F = { all: () => true, max: a => a.custom.tarifario === 'Biz Max', std: a => a.custom.tarifario === 'Biz Standard', free: a => !a.assigned, nodev: a => !phoneOfLine(a) };
+  const cur = st.filter.linhas || 'all';
+  const rows = base.filter(F[cur]).filter(a => matches('linhas', a.custom.numero, a.name, uname(ownerOfLine(a)), phoneOfLine(a)?.serial, phoneOfLine(a) && modelLabel(phoneOfLine(a).model), company(a.company).name));
+  const lineRow = a => { const p = phoneOfLine(a), o = ownerOfLine(a); return `<tr><td><span class="chip">${esc(a.custom.tarifario || '—')}</span></td><td style="white-space:nowrap"><a class="mono" style="font-weight:600" data-act="open-asset" data-id="${a.id}">${esc(a.name)}</a></td><td>${o ? esc(uname(o)) : '<i class="muted">Livre</i>'}</td><td style="white-space:nowrap">${pinCell(a)}</td><td>${p ? `<a data-act="open-asset" data-id="${p.id}">${esc(modelLabel(p.model))}</a>` : '<span class="muted">—</span>'}</td><td class="mono">${esc(p?.serial || '—')}</td><td>${fmt(a.custom.ativacao)}</td><td class="muted">${esc([a.custom.acessorios, a.custom.portado ? 'Portada: ' + a.custom.portado : ''].filter(Boolean).join(' · ') || '—')}</td></tr>`; };
+  return `<div class="row between"><div><h1>Linhas móveis</h1><div class="muted">${plural(base.length, 'linha', 'linhas')} · ${plural(base.filter(F.free).length, 'livre', 'livres')} · ${base.filter(F.nodev).length} sem telemóvel · por empresa</div></div>${canWrite() ? '<button class="btn primary" data-act="new-kind" data-kind="line">+ Nova linha</button>' : ''}</div>
+  <section class="card" style="display:flex;flex-direction:column;gap:12px"><div class="row between">${tabs('linhas', [['all', 'Todas', base.length], ['max', 'Biz Max', base.filter(F.max).length], ['std', 'Biz Standard', base.filter(F.std).length], ['free', 'Livres', base.filter(F.free).length], ['nodev', 'Sem telemóvel', base.filter(F.nodev).length]])}${searchBox('linhas', 'Número, nome ou IMEI…')}</div>
+  ${companyBar(allMine().filter(kinds).filter(F[cur]))}
+  ${grouped(rows, ['Tarifário', 'Nº telefone', 'Nome', 'PIN / PUK', 'Telemóvel', 'IMEI', 'Ativação', 'Acessórios / notas'], lineRow, 1050, l => `${plural(l.length, 'linha', 'linhas')} · ${plural(l.filter(a => !a.assigned).length, 'livre', 'livres')}`)}
+  <p class="small muted" style="margin:0">O PIN/PUK está cifrado. Cada vez que alguém carrega em "Mostrar", fica registado no histórico.</p></section>`;
+}
+
+const accOpen = x => db.accCheckouts.filter(c => c.acc === x.id && !c.inAt);
+const accAvail = x => x.qty - accOpen(x).length;
+function pageAcessorios() {
+  const rows = db.accessories.filter(x => inScope(x.company)).filter(x => matches('acessorios', x.name, x.category, company(x.company).name));
+  return `<div class="row between"><div><h1>Acessórios</h1><div class="muted">Artigos em quantidade, sem n.º de série, por empresa</div></div>${canWrite() ? '<button class="btn primary" data-act="new-acc">+ Novo acessório</button>' : ''}</div>
+  <section class="card" style="display:flex;flex-direction:column;gap:12px"><div class="row between">${companyBar(db.accessories.filter(x => myCompanies().includes(x.company)))}${searchBox('acessorios', 'Nome ou categoria…')}</div>
+  ${grouped(rows, ['Nome', 'Categoria', 'Total', 'Disponíveis', 'Mínimo', ''], x => { const av = accAvail(x); return `<tr><td style="font-weight:600">${esc(x.name)}</td><td>${esc(x.category)}</td><td>${x.qty}</td><td style="color:${av < x.min ? 'var(--danger)' : 'inherit'};font-weight:600">${av}</td><td>${x.min}</td><td style="text-align:right;white-space:nowrap"><button class="btn sm" data-act="acc-list" data-id="${x.id}">Entregues (${accOpen(x).length})</button> ${canWrite() ? `<button class="btn sm primary" data-act="acc-out" data-id="${x.id}" ${av ? '' : 'disabled'}>Entregar</button>` : ''}</td></tr>`; }, 720, l => `${plural(l.length, 'acessório', 'acessórios')} · ${l.filter(x => accAvail(x) < x.min).length} com stock baixo`)}</section>`;
+}
+
+function userItems(u) { return { assets: db.assets.filter(a => !a.deleted && a.assigned?.type === 'user' && a.assigned.id === u.id), acc: db.accCheckouts.filter(c => c.user === u.id && !c.inAt) }; }
+function pageUtilizadores() {
+  if (st.userDetail) return pageUserDetail(user(st.userDetail));
+  const base = db.users.filter(u => u.company == null ? isAdmin() || db.ui.company === 'all' : inScope(u.company));
+  const F = { all: () => true, login: u => u.login, admin: u => u.login && u.role === 'admin', nologin: u => !u.login };
+  const cur = st.filter.utilizadores || 'all';
+  const rows = base.filter(F[cur]).filter(u => matches('utilizadores', uname(u), u.email, company(u.company)?.name, ROLE_LABEL[u.role]));
+  return `<div class="row between"><div><h1>Utilizadores</h1><div class="muted">Pessoas com e sem login, por empresa</div></div><div class="row">${isAdmin() ? '<button class="btn" data-act="new-login">+ Novo login</button>' : ''}${canWrite() ? '<button class="btn primary" data-act="new-user">+ Novo utilizador</button>' : ''}</div></div>
+  <section class="card" style="display:flex;flex-direction:column;gap:12px"><div class="row between">${tabs('utilizadores', [['all', 'Todos', base.length], ['login', 'Com login', base.filter(F.login).length], ['admin', 'Pode mexer', base.filter(F.admin).length], ['nologin', 'Sem login', base.filter(F.nologin).length]])}${searchBox('utilizadores', 'Nome, e-mail, empresa…')}</div>
+  ${companyBar(db.users.filter(u => u.company && myCompanies().includes(u.company)).filter(F[cur]))}
+  ${grouped(rows, ['Nome', 'Login', 'Assets', 'Acessórios', 'Estado'], u => { const it = userItems(u); return `<tr class="click" data-act="open-user" data-id="${u.id}"><td><a style="font-weight:600">${esc(uname(u))}</a>${u.email ? `<div class="small muted">${esc(u.email)}</div>` : ''}</td><td>${u.login ? `<span class="chip">${ROLE_LABEL[u.role]}</span>${db.ui.sessions.includes(u.id) ? ' <span class="chip"><span class="dot" style="background:#16A34A"></span>ligado</span>' : ''}` : '<span class="muted">Sem login</span>'}</td><td>${it.assets.length}</td><td>${it.acc.length}</td><td>${u.active ? '<span class="chip"><span class="dot" style="background:#16A34A"></span>Ativo</span>' : '<span class="chip">Inativo</span>'}</td></tr>`; }, 680, l => plural(l.length, 'pessoa', 'pessoas'))}</section>`;
+}
+
+const TOKEN_EXPIRY = { 30: '30 dias', 90: '90 dias', 365: '1 ano', never: 'Sem fim' };
+function pageTokens() {
+  if (!canWrite()) return '<div class="warnbox">Só quem pode mexer gera tokens.</div>';
+  const mine = (db.tokens ||= []).filter(t => t.user === me().id).sort((a, b) => b.created - a.created);
+  const d = ts => new Date(ts).toLocaleDateString('pt-PT');
+  return `<div><h1>Tokens da API</h1><div class="muted">Um token é a chave que um programa (script, Power BI, ferramenta do Snipe-IT) usa para falar com a API, no cabeçalho <span class="mono">Authorization: Bearer &lt;token&gt;</span>. Dá a cada programa o seu token, só com o acesso de que precisa.</div></div>
+  ${st.newToken ? `<div class="notice" role="status"><b>Token criado. Copia-o agora: não volta a aparecer.</b><div class="mono" style="word-break:break-all;margin-top:6px">${esc(st.newToken)}</div></div>` : ''}
+  <form data-form="new-token" class="card" style="display:flex;flex-direction:column;gap:12px"><b>Gerar token</b>
+    <div class="form-grid"><label class="f">Nome<input id="tk-name" name="name" placeholder="ex.: Power BI, script do Intune" required></label><label class="f">Validade<select name="expires">${Object.entries(TOKEN_EXPIRY).map(([k, v]) => `<option value="${k}" ${k === '365' ? 'selected' : ''}>${v}</option>`).join('')}</select></label></div>
+    <fieldset style="border:1px solid var(--border);border-radius:10px;padding:12px;margin:0;display:flex;flex-direction:column;gap:10px"><legend class="small muted" style="padding:0 6px">Acesso</legend>
+      <label class="row" style="gap:10px;align-items:flex-start;flex-wrap:nowrap"><input type="radio" name="access" value="read" checked style="width:18px;height:18px;margin-top:2px"><span><b>Só leitura</b><br><span class="small muted">Consulta equipamentos, pessoas, linhas, histórico e o resumo por empresa. Não altera nada e não vê PIN/PUK. Para relatórios e Power BI.</span></span></label>
+      <label class="row" style="gap:10px;align-items:flex-start;flex-wrap:nowrap"><input type="radio" name="access" value="write" style="width:18px;height:18px;margin-top:2px"><span><b>Leitura e escrita</b><br><span class="small muted">Pode também criar, editar, apagar, fazer check-in/out e ver PIN/PUK. Só para scripts que precisam mesmo de alterar dados.</span></span></label>
+    </fieldset><div><button class="btn primary" type="submit">Gerar token</button></div></form>
+  <section class="card"><div class="tablebox"><table><thead><tr><th>Nome</th><th>Acesso</th><th>Validade</th><th>Último uso</th><th></th></tr></thead><tbody>
+  ${mine.length ? mine.map(t => { const expired = t.expires && t.expires < Date.now(); return `<tr><td><b>${esc(t.name)}</b><div class="small muted">criado ${d(t.created)}</div></td><td><span class="chip">${t.access === 'write' ? 'Leitura e escrita' : 'Só leitura'}</span></td><td class="${expired ? '' : 'muted'}" style="${expired ? 'color:var(--danger)' : ''}">${expired ? 'Expirou a ' + d(t.expires) : t.expires ? 'até ' + d(t.expires) : 'sem fim'}</td><td class="muted">nunca</td><td style="text-align:right"><button class="btn sm" data-act="revoke-token" data-id="${t.id}">${expired ? 'Apagar' : 'Revogar'}</button></td></tr>`; }).join('') : '<tr><td colspan="5" class="muted">Ainda não tens tokens.</td></tr>'}
+  </tbody></table></div><p class="small muted" style="margin:10px 0 0">Na demonstração os tokens não funcionam numa API a sério; no servidor, um token só de leitura recebe "403 Este token é só de leitura" se tentar alterar dados.</p></section>`;
+}
+
+function pageEmpresas() {
+  if (!isAdmin()) return '<div class="warnbox">Só quem pode mexer gere as empresas.</div>';
+  const stats = c => { const as = db.assets.filter(a => !a.deleted && a.company === c.id); return { assets: as.filter(a => ['device', 'phone'].includes(kindOf(a))).length, printers: as.filter(a => kindOf(a) === 'printer').length, servers: as.filter(a => ['server', 'nas'].includes(kindOf(a))).length, lines: as.filter(a => kindOf(a) === 'line').length, acc: db.accessories.filter(x => x.company === c.id).length, users: db.users.filter(u => u.company === c.id).length }; };
+  const rows = db.companies.filter(c => matches('empresas', c.name, c.code, c.nif));
+  return `<div class="row between"><div><h1>Empresas</h1><div class="muted">Cada equipamento, linha, acessório e pessoa pertence a uma empresa</div></div><button class="btn primary" data-act="new-company">+ Nova empresa</button></div>
+  <section class="card" style="display:flex;flex-direction:column;gap:12px"><div class="row between"><span class="muted">${plural(db.companies.length, 'empresa', 'empresas')}</span>${searchBox('empresas', 'Nome, código, NIF…')}</div>
+  <div class="tablebox"><table style="min-width:900px"><thead><tr><th>Empresa</th><th>Código</th><th>NIF</th><th>Assets</th><th>Impressoras</th><th>Servidores/NAS</th><th>Linhas</th><th>Acessórios</th><th>Pessoas</th><th>Estado</th><th></th></tr></thead><tbody>
+  ${rows.map(c => { const s = stats(c); return `<tr><td style="font-weight:600">${esc(c.name)}</td><td><span class="chip">${esc(c.code)}</span></td><td class="mono">${esc(c.nif || '—')}</td><td>${s.assets}</td><td>${s.printers}</td><td>${s.servers}</td><td>${s.lines}</td><td>${s.acc}</td><td>${s.users}</td><td>${c.active === false ? '<span class="chip">Desativada</span>' : '<span class="chip"><span class="dot" style="background:#16A34A"></span>Ativa</span>'}</td><td style="text-align:right;white-space:nowrap"><button class="btn sm" data-act="edit-company" data-id="${c.id}">Editar</button></td></tr>`; }).join('')}</tbody></table></div>
+  <p class="small muted" style="margin:0">A próxima asset tag de cada empresa usa o código como prefixo (ex.: ${esc(db.companies[0]?.code || 'CNT')}-00001). Uma empresa desativada deixa de aparecer nos formulários de registo, mas os dados ficam.</p></section>`;
+}
+
+function pageUserDetail(u) {
+  const it = userItems(u);
+  return `<div><a data-act="back-users">← Utilizadores</a></div>
+  <div class="row between"><div><h1>${esc(uname(u))}</h1><div class="muted">${esc(company(u.company)?.name || 'Sem empresa')}${u.email ? ' · ' + esc(u.email) : ''}${u.login ? ' · ' + ROLE_LABEL[u.role] : ' · sem login'}</div></div>
+  ${canWrite() ? `<div class="row">${it.assets.length || it.acc.length ? `<button class="btn" data-act="return-all" data-id="${u.id}">Devolver tudo</button>` : ''}${isAdmin() ? `<button class="btn" data-act="edit-login" data-id="${u.id}">${u.login ? 'Editar acesso' : 'Dar login'}</button>` : ''}<button class="btn" data-act="toggle-active" data-id="${u.id}">${u.active ? 'Desativar' : 'Ativar'}</button></div>` : ''}</div>
+  <section class="card"><h2 style="margin-bottom:10px">Assets atribuídos (${it.assets.length})</h2>
+  ${it.assets.length ? `<div class="tablebox"><table><thead><tr><th>Tag</th><th>Modelo</th><th>S/N / IMEI</th><th>Desde</th></tr></thead><tbody>${it.assets.map(a => `<tr class="click" data-act="open-asset" data-id="${a.id}"><td><a class="mono">${esc(a.tag)}</a></td><td>${esc(modelLabel(a.model))}</td><td class="mono">${esc(a.serial || '—')}</td><td class="muted">${fmtDT(a.lastCheckout || a.created)}</td></tr>`).join('')}</tbody></table></div>` : '<div class="muted">Nada atribuído.</div>'}</section>
+  <section class="card"><h2 style="margin-bottom:10px">Acessórios (${it.acc.length})</h2>
+  ${it.acc.length ? `<div class="tablebox"><table><thead><tr><th>Acessório</th><th>Entregue</th><th></th></tr></thead><tbody>${it.acc.map(c => `<tr><td>${esc(db.accessories.find(x => x.id === c.acc)?.name)}</td><td class="muted">${fmtDT(c.at)}</td><td style="text-align:right">${canWrite() ? `<button class="btn sm" data-act="acc-in" data-id="${c.id}">Receber</button>` : ''}</td></tr>`).join('')}</tbody></table></div>` : '<div class="muted">Nenhum acessório.</div>'}</section>
+  <section class="card"><h2 style="margin-bottom:6px">Histórico</h2>${logTable(db.logs.filter(l => (l.targetType === 'user' && l.targetId === u.id) || (l.itemType === 'user' && l.itemId === u.id)).sort((a, b) => b.at.localeCompare(a.at)))}</section>`;
+}
+
+const norm = v => String(v ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const cap = w => w ? w[0].toUpperCase() + w.slice(1).toLowerCase() : w;
+function parseDelimited(text) {
+  const lines = text.replace(/\r\n?/g, '\n').split('\n');
+  const head = lines.find(l => l.trim()) || '';
+  const delim = ['\t', ';', ','].map(d => [d, head.split(d).length]).sort((a, b) => b[1] - a[1])[0][0];
+  const rows = []; let row = [], cell = '', q = false;
+  const src = text.replace(/\r\n?/g, '\n');
+  for (let i = 0; i < src.length; i++) {
+    const ch = src[i];
+    if (q) { if (ch === '"') { if (src[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; continue; }
+    if (ch === '"' && cell === '') q = true;
+    else if (ch === delim) { row.push(cell); cell = ''; }
+    else if (ch === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
+    else cell += ch;
+  }
+  row.push(cell); rows.push(row);
+  const clean = rows.map(r => r.map(c => c.trim())).filter(r => r.some(Boolean));
+  return { headers: clean[0] || [], rows: clean.slice(1), delim };
+}
+function parseDate(v) {
+  const s = String(v || '').trim(); let m;
+  if ((m = s.match(/^(\d{4})-(\d{2})-(\d{2})/))) return `${m[1]}-${m[2]}-${m[3]}`;
+  if ((m = s.match(/(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/))) { const y = m[3].length === 2 ? '20' + m[3] : m[3]; return `${y}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`; }
+  return '';
+}
+const luhn = s => { if (!/^\d{15}$/.test(s)) return false; let sum = 0; for (let i = 0; i < 15; i++) { let d = +s[14 - i]; if (i % 2) { d *= 2; if (d > 9) d -= 9; } sum += d; } return sum % 10 === 0; };
+const BRAND_ALIASES = { samsung: 'Samsung', oppo: 'OPPO', motorola: 'Motorola', moto: 'Motorola', iphone: 'Apple', apple: 'Apple', xiaomi: 'Xiaomi', redmi: 'Xiaomi', huawei: 'Huawei', nokia: 'Nokia', lenovo: 'Lenovo', dell: 'Dell', hp: 'HP', hpe: 'HPE', synology: 'Synology', qnap: 'QNAP' };
+function parsePhone(txt) {
+  let t = String(txt || '').trim(); if (!t) return null;
+  const isNew = /\bnov[oa]s?\b/i.test(t), date = parseDate(t);
+  t = t.replace(/\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}/g, '').replace(/\bnov[oa]s?\b/ig, '').replace(/[-–\s]+$/g, '').replace(/^[-–\s]+/g, '').replace(/\s+/g, ' ').trim();
+  const words = t.split(' '), first = words[0].toLowerCase();
+  const brand = BRAND_ALIASES[first] || cap(words[0]);
+  let rest = (BRAND_ALIASES[first] && first !== 'iphone' && first !== 'moto' ? words.slice(1) : words);
+  rest = rest.map(w => /\d/.test(w) ? w.toUpperCase() : (w.length <= 3 ? w.toUpperCase() : cap(w)));
+  let model = rest.join(' ');
+  if (brand === 'Samsung' && /^[AMSZ]\d/i.test(model)) model = 'Galaxy ' + model;
+  if (first === 'iphone') model = 'iPhone ' + words.slice(1).join(' ');
+  return { brand, model: model || words.join(' '), isNew, date };
+}
+function parseLineNotes(txt) {
+  const out = { raw: String(txt || '').trim() }; if (!out.raw) return out;
+  const date = parseDate(out.raw);
+  const port = out.raw.match(/portad[oa]s?\s+(?:da|de|do|pela|pelo)?\s*(.+?)(?:\s*[-–]\s*\d|\s*$)/i);
+  const acc = [];
+  if (/\bcapas?\b/i.test(out.raw)) acc.push('Capa');
+  if (/p[aeé]l[ií]culas?/i.test(out.raw)) acc.push('Película');
+  if (port) { out.portado = port[1].replace(/[-–\s]+$/, '').trim(); out.ativacao = date; }
+  if (acc.length) { out.acessorios = acc.join(', '); out.accNew = /\bnov[oa]s?\b/i.test(out.raw); if (!port) out.accDate = date; }
+  if (!port && !acc.length) { if (date && out.raw.replace(/[\d\/.\-\s]/g, '') === '') out.ativacao = date; else out.unknown = true; }
+  return out;
+}
+
+const IO = {
+  assets: { label: 'Assets', kinds: ['device', 'phone'], fields: [['company', 'Empresa', 'empresa company'], ['tag', 'Asset tag', 'tag assettag etiqueta'], ['name', 'Nome', 'nome name descricao assetname itemname'], ['brand', 'Marca', 'marca fabricante manufacturer'], ['model', 'Modelo', 'modelo model modelname'], ['category', 'Categoria', 'categoria category tipo'], ['serial', 'S/N / IMEI', 'sn serial serialnumber numerodeserie nserie imei'], ['status', 'Estado', 'estado status statuslabel'], ['location', 'Localização', 'localizacao local location'], ['purchase', 'Data de compra', 'datadecompra datacompra compra purchasedate purchased'], ['cost', 'Custo', 'custo preco valor cost purchasecost'], ['warranty', 'Garantia (meses)', 'garantia garantiameses warranty warrantymonths'], ['assigned', 'Atribuído a', 'atribuidoa atribuido utilizador pessoa colaborador user fullname checkedoutto assignedto'], ['email', 'E-mail da pessoa', 'email emaildapessoa'], ['notes', 'Notas', 'notas observacoes obs notes']] },
+  snipeit: { label: 'Snipe-IT (assets)', kinds: ['device', 'phone', 'printer', 'server', 'nas'], fields: [['company', 'Company', 'company empresa'], ['tag', 'Asset Tag', 'assettag tag'], ['name', 'Asset Name', 'assetname itemname name'], ['brand', 'Manufacturer', 'manufacturer marca'], ['model', 'Model Name', 'modelname model modelo'], ['modelno', 'Model Number', 'modelnumber modelno'], ['category', 'Category', 'category categoria'], ['serial', 'Serial', 'serial serialnumber sn'], ['status', 'Status', 'status statuslabel estado'], ['location', 'Location', 'location localizacao'], ['purchase', 'Purchase Date', 'purchasedate purchased'], ['cost', 'Purchase Cost', 'purchasecost cost'], ['order', 'Order Number', 'ordernumber'], ['warranty', 'Warranty Months', 'warrantymonths warranty'], ['assigned', 'Full Name', 'fullname checkedoutto assignedto'], ['email', 'Email', 'email'], ['ip', 'IP Address', 'ipaddress ip'], ['hostname', 'Hostname', 'hostname'], ['imei', 'IMEI', 'imei'], ['notes', 'Notes', 'notes notas']] },
+  printers: { label: 'Impressoras', kinds: ['printer'], fields: [['company', 'Empresa', 'empresa'], ['hostname', 'Nome (hostname)', 'nome hostname name'], ['brand', 'Marca', 'marca'], ['model', 'Modelo', 'modelo'], ['serial', 'S/N', 'sn serial numerodeserie'], ['ip', 'IP', 'ip enderecoip'], ['tecnologia', 'Tecnologia', 'tecnologia laser'], ['cor', 'Cor', 'cor color'], ['multifuncoes', 'Multifunções', 'multifuncoes mfp'], ['location', 'Localização', 'localizacao local sala']] },
+  servers: { label: 'Servidores e NAS', kinds: ['server', 'nas'], fields: [['company', 'Empresa', 'empresa'], ['hostname', 'Nome', 'nome hostname name'], ['type', 'Tipo', 'tipo type'], ['brand', 'Marca', 'marca'], ['model', 'Modelo', 'modelo'], ['serial', 'S/N', 'sn serial'], ['ip', 'IP', 'ip enderecoip'], ['location', 'Localização', 'localizacao local bastidor']] },
+  lines: { label: 'Linhas móveis', kinds: ['line'], fields: [['company', 'Empresa', 'empresa'], ['tarifario', 'Tarifário', 'tarifario tarifarios plano'], ['numero', 'Nº telefone', 'nrtelefone ntelefone numero telefone numerodetelefone telemovelnumero'], ['nome', 'Nome', 'nome utilizador colaborador'], ['pinpuk', 'PIN/PUK', 'pinpuk'], ['pin', 'PIN', 'pin'], ['puk', 'PUK', 'puk'], ['telemovel', 'Telemóvel', 'telemovel equipamento aparelho modelo'], ['imei', 'IMEI', 'imei'], ['notas', 'Data ativação / notas', 'dataativacao ativacao dataactivacao notas observacoes']] },
+  accessories: { label: 'Acessórios', fields: [['company', 'Empresa', 'empresa company'], ['name', 'Nome', 'nome name itemname'], ['category', 'Categoria', 'categoria category'], ['qty', 'Quantidade', 'quantidade qty total quantity'], ['min', 'Stock mínimo', 'minimo stockminimo min minqty minamt']] },
+  users: { label: 'Utilizadores', fields: [['company', 'Empresa', 'empresa company'], ['first', 'Nome', 'nome primeironome first firstname'], ['last', 'Apelido', 'apelido sobrenome last lastname'], ['email', 'E-mail', 'email mail correio'], ['full', 'Nome completo', 'nomecompleto fullname name']] }
+};
+const SAMPLE_LINES = `Tarifários\tNrº Telefone\tNome\tPIN/PUK\tTelemóvel\tIMEI\tData Ativação
+Biz Max\t913000101\tPaulo Mendes\t1435 / 01271758\tSamsung A13\t354360411847635\tPortado da Empresa Antiga - 01/08/24
+Biz Standard\t913000102\tBeatriz Faria\t\tSamsung A16\t350828941187049\tCapa + Pelicula - NOVO 13/01/2025
+Biz Standard\t913000103\tMarta Sousa\t3626 / 24997297\tOPPO A38\t860133067098754\tPelicula + Capa
+Biz Standard\t913000104\tHugo Antunes\t8327 / 75251051\tSAMSUNG A15 - NOVO\t354747953943287\tCAPA + PELICULA - 10/12/2024
+Biz Standard\t913000105\tCláudia Reis\t\tOppo A40\t868622078187979\tCapa + palicula NOVOS - 08/07/2025
+Biz Standard\t913000106\tNuno Brito\t\t\t\t
+Biz Standard\t913000107\tSérgio Lopes\t\tMotorola Moto G35 5G\t\t capa + pelicula NOVOS - 31/07/2025
+Biz Standard\t913000108\tLaura Pinto\t\tSAMSUNG A33 26/04/2023\t
+Biz Standard\t9130001\tErro Exemplo\t\t\t\t`;
+const SNIPE_SAMPLE = `Company,Asset Tag,Asset Name,Manufacturer,Model Name,Model Number,Category,Serial,Status,Location,Purchase Date,Purchase Cost,Order Number,Warranty Months,Full Name,Email,IP Address,Notes
+Construções Norte,SN-1001,,Lenovo,ThinkPad T14 Gen 3,21AH,Laptops,PF3ABC01,Deployed,Sede Porto,2023-04-12,999.00,ENC-2023-118,36,Pedro Lima,,,
+Construções Norte,SN-1002,,Dell,Latitude 5430,,Laptops,CN54301X,Ready to Deploy,Sede Porto · Armazém IT,2023-05-02,920.00,,36,,,,
+Construções Norte,SN-1003,PRT-ARMAZEM,HP,LaserJet Pro M404n,,Printers,PHBQK77777,Ready to Deploy,Sede Porto · Armazém IT,2022-09-20,289.00,,12,,,10.0.1.32,Junto à porta
+Serviços Sul,SN-2001,SRV-BKP02,Dell,PowerEdge R450,,Servers,SVCTAG77,Ready to Deploy,Escritório Lisboa · Sala técnica,2024-01-15,3200.00,,60,,,10.1.1.12,
+Serviços Sul,SN-2002,,Samsung,Galaxy A54,SM-A546B,Mobile Phones,356789104455661,Deployed,Escritório Lisboa,2024-03-01,399.00,,24,Rui Costa,,,
+Holding do Grupo,SN-3001,,Apple,MacBook Pro 14,,Laptops,C02XK2ABCD,Out for Repair,Sede Porto,2022-11-03,2299.00,,12,,,,Teclado
+Empresa Antiga,SN-4001,,HP,ProBook 450 G8,,Laptops,5CD1234567,Archived,,2019-02-01,700.00,,24,,,,`;
+const SNIPE_STATUS = { checkedout: 'Pronto', readytodeploy: 'Pronto', deployed: 'Pronto', deployable: 'Pronto', pending: 'Em preparação', outforrepair: 'Em reparação', inrepair: 'Em reparação', broken: 'Avariado', outfordiagnostics: 'Em reparação', lost: 'Avariado', stolen: 'Avariado', loststolen: 'Avariado', archived: 'Abatido', retired: 'Abatido', disposed: 'Abatido' };
+const SNIPE_CATEGORY = [[/laptop|notebook|portat/, 'device', 'Portátil'], [/desktop|workstation|^pcs?$|computador/, 'device', 'Desktop'], [/monitor|display|ecra/, 'device', 'Monitor'], [/mobile|phone|smartphone|telemovel|telefone/, 'phone', 'Telemóvel'], [/printer|impressora|mfp|scanner/, 'printer', 'Impressora'], [/^nas$|storage|network attached/, 'nas', 'NAS'], [/server|servidor/, 'server', 'Servidor'], [/tablet|ipad/, 'device', 'Tablet']];
+const SNIPE_LAYOUT = [
+  ['Asset Tag', 'Asset tag', 'Recomendada', 'SN-1001', 'Mantém a tag do Snipe-IT. Se vier vazia, é gerada com o prefixo da empresa.'],
+  ['Company', 'Empresa', 'Não', 'Construções Norte', 'Nome ou código. Se faltar, usa a empresa por defeito.'],
+  ['Manufacturer', 'Marca', 'Sim', 'Lenovo', 'Criada se não existir.'],
+  ['Model Name', 'Modelo', 'Sim', 'ThinkPad T14 Gen 3', 'Criado se não existir.'],
+  ['Category', 'Secção', 'Sim', 'Laptops', 'Decide para onde vai: Laptops/Desktops/Monitors → Assets, Mobile Phones → Telemóvel, Printers → Impressoras, Servers/NAS → Servidores e NAS.'],
+  ['Serial', 'S/N', 'Recomendada', 'PF3ABC01', 'Usada para não duplicar e para atualizar.'],
+  ['Status', 'Estado', 'Não', 'Ready to Deploy', 'Ready to Deploy/Deployed → Pronto, Pending → Em preparação, Out for Repair → Em reparação, Broken/Lost → Avariado, Archived → Abatido.'],
+  ['Full Name (ou Checked Out To)', 'Atribuído a', 'Não', 'Pedro Lima', 'A pessoa é encontrada pelo nome ou pelo Email; se não existir, é criada.'],
+  ['Location', 'Localização', 'Não', 'Sede Porto', 'Criada se não existir. Impressoras e servidores ficam atribuídos a esta localização.'],
+  ['Purchase Date', 'Data de compra', 'Não', '2023-04-12', 'Aceita AAAA-MM-DD e DD/MM/AAAA.'],
+  ['Purchase Cost', 'Custo', 'Não', '999.00', ''],
+  ['Warranty Months', 'Garantia (meses)', 'Não', '36', ''],
+  ['Asset Name', 'Nome', 'Não', 'PRT-ARMAZEM', 'Nas impressoras e servidores passa a ser o hostname.'],
+  ['IP Address (campo personalizado)', 'IP', 'Não', '10.0.1.32', 'Para impressoras e servidores.'],
+  ['Model Number, Order Number, Notes', 'Notas', 'Não', 'ENC-2023-118', 'Guardados nas notas.'],
+];
+const SAMPLES = {
+  snipeit: SNIPE_SAMPLE,
+  lines: SAMPLE_LINES,
+  assets: `Empresa;Marca;Modelo;Categoria;S/N;Estado;Localização;Data de compra;Custo;Garantia;Atribuído a\nCNT;Lenovo;ThinkPad T14 Gen 4;Portátil;PF5X0001;Pronto;Sede Porto · Armazém IT;15/10/2026;1089;36;\nCNT;Lenovo;ThinkPad E14 Gen 6;Portátil;PF5X0002;Pronto;Sede Porto · Armazém IT;15/10/2026;749;24;Ana Ribeiro\nSSL;Dell;Latitude 5450;Portátil;CN0R9999;Pronto;Escritório Lisboa;02/11/2026;1020;36;Rui Costa\nCNT;Lenovo;ThinkPad T14 Gen 4;Portátil;PF4X1A2B;Pronto;;;;;\nXYZ;HP;EliteBook 840 G11;Portátil;5CG9999;Pronto;;;;;`,
+  printers: `Empresa;Nome;Marca;Modelo;S/N;IP;Tecnologia;Cor;Multifunções;Localização\nCNT;PRT-MAIA01;HP;LaserJet M404dn;PHBQK55555;10.0.5.30;Laser;Mono;Não;Estaleiro Maia\nSSL;PRT-LIS02;Brother;MFC-L8900CDW;E78123456;10.1.1.31;Laser;Cor;Sim;Escritório Lisboa`,
+  servers: `Empresa;Nome;Tipo;Marca;Modelo;IP;Localização\nCNT;SRV-FS01;Servidor;Dell;PowerEdge R660;10.0.1.11;Sede Porto · Bastidor B\nSSL;NAS-LIS02;NAS;Synology;DS923+;10.1.1.51;Escritório Lisboa · Sala técnica`,
+  accessories: `Empresa;Nome;Categoria;Quantidade;Stock mínimo\nCNT;Headset Jabra Evolve2 30;Áudio;10;3\nSSL;Rato Logitech M185;Periféricos;15;5`,
+  users: `Empresa;Nome;Apelido;E-mail\nCNT;Ricardo;Gomes;ricardo.gomes@example.com\nSSL;Teresa;Alves;teresa.alves@example.com`
+};
+const BRAND_HINTS = [[/probook|elitebook|zbook|elitedesk|prodesk|laserjet|officejet|deskjet|pavilion/, 'HP'], [/latitude|optiplex|precision|vostro|inspiron|poweredge|xps/, 'Dell'], [/thinkpad|thinkcentre|thinkstation|ideapad|thinkvision|thinksystem/, 'Lenovo'], [/macbook|imac|macmini|iphone|ipad/, 'Apple'], [/galaxy/, 'Samsung'], [/^diskstation|^ds\d|^rs\d/, 'Synology'], [/proliant/, 'HPE'], [/surface/, 'Microsoft']];
+const guessBrand = mdl => { const n = norm(mdl); const known = db.models.find(m => norm(m.name) === n); return known ? db.manufacturers.find(x => x.id === known.manufacturer)?.name : BRAND_HINTS.find(([re]) => re.test(n))?.[1] || null; };
+const DEVICE_WORDS = /\b(pc|portatil|laptop|desktop|monitor|impressora|printer|servidor|server|nas|switch|router|telemovel|tablet|ipad|iphone|ecra|sala|armazem|stock|reserva|spare|teste|test|backup|g\d|gen)\b/i;
+const looksPerson = v => { const t = String(v || '').trim(); if (!t || /\d|@|[-_\/]/.test(t)) return false; const w = t.split(/\s+/); return w.length >= 2 && w.length <= 5 && w.every(x => /^[A-Za-zÀ-ÿ'.]{2,}$/.test(x) || /^(da|de|do|das|dos|e)$/i.test(x)) && !DEVICE_WORDS.test(t.normalize('NFD').replace(/[\u0300-\u036f]/g, '')); };
+function detectModule(headers) {
+  const hn = headers.map(norm);
+  if (hn.includes('assettag') && ['modelname', 'model', 'manufacturer', 'category', 'serial'].filter(h => hn.includes(h)).length >= 2) return 'snipeit';
+  const exact = m => headers.filter(h => { const n = norm(h); return IO[m].fields.some(([, label, syn]) => norm(label) === n || syn.split(' ').includes(n)); }).length;
+  const scores = Object.keys(IO).filter(m => m !== 'snipeit').map(m => [m, exact(m)]).sort((a, b) => b[1] - a[1]);
+  return scores[0][1] >= 2 && scores[0][1] > (scores[1]?.[1] || 0) ? scores[0][0] : null;
+}
+function autoMap(module, headers) {
+  const defs = IO[module].fields, used = new Set();
+  return headers.map(h => { const n = norm(h); const f = defs.find(([k, label, syn]) => !used.has(k) && (norm(label) === n || syn.split(' ').some(s => s === n))) || defs.find(([k, , syn]) => !used.has(k) && n.length > 2 && syn.split(' ').some(s => s.length > 3 && (n.includes(s) || s.includes(n)))); if (f) used.add(f[0]); return f ? f[0] : ''; });
+}
+
+function importCtx(defaultCompany, autoCreate) {
+  return { defaultCompany, autoCreate, seenSerial: new Set(), seenNumber: new Set(), seenTag: new Set(), creates: { manufacturers: new Set(), models: new Set(), users: new Set(), locations: new Set(), companies: new Set() } };
+}
+const findCompanyByText = v => { const n = norm(v); return n ? db.companies.find(c => norm(c.code) === n || norm(c.name) === n) : null; };
+const findMaker = name => db.manufacturers.find(m => norm(m.name) === norm(name));
+const findModel = (brandId, name) => db.models.find(m => m.manufacturer === brandId && (norm(m.name) === norm(name) || norm(m.name).replace(/^galaxy/, '') === norm(name).replace(/^galaxy/, '')));
+const findUserByText = (v, companyId) => { const n = norm(v); if (!n) return null; const all = db.users.filter(u => norm(u.email) === n || norm(uname(u)) === n); return all.find(u => u.company === companyId) || all[0] || null; };
+const findLoc = (v, companyId) => db.locations.find(l => norm(l.name) === norm(v) && (l.company == null || l.company === companyId));
+const findStatus = v => db.statuses.find(s => norm(s.name) === norm(v)) || (SNIPE_STATUS[norm(v)] && db.statuses.find(s => s.name === SNIPE_STATUS[norm(v)]));
+
+function ensureModel(batch, brandName, modelName, categoryId) {
+  let mk = findMaker(brandName);
+  if (!mk) { mk = { id: nextId(), name: brandName }; db.manufacturers.push(mk); batch.created.manufacturers.push(mk.id); }
+  let md = findModel(mk.id, modelName);
+  if (!md) { md = { id: nextId(), manufacturer: mk.id, name: modelName, category: categoryId }; db.models.push(md); batch.created.models.push(md.id); }
+  return md;
+}
+const nameFromEmail = e => e.split('@')[0].split(/[._-]+/).filter(Boolean).map(cap).join(' ');
+function ensureUser(batch, fullName, companyId, email) {
+  const isMail = v => /@/.test(v || '');
+  if (isMail(fullName) && !email) { email = fullName; fullName = ''; }
+  let u = (email && db.users.find(x => norm(x.email) === norm(email))) || (fullName && findUserByText(fullName, companyId));
+  if (!u) { const parts = (fullName || nameFromEmail(email)).trim().split(/\s+/).map(w => /^(da|de|do|das|dos|e)$/i.test(w) ? w.toLowerCase() : w === w.toUpperCase() || w === w.toLowerCase() ? cap(w.toLowerCase()) : w); u = { id: nextId(), first: parts[0], last: parts.slice(1).join(' '), email: email || '', company: companyId, active: true }; db.users.push(u); batch.created.users.push(u.id); log('create', 'user', u.id, null, 'Importação'); }
+  else if (email && !u.email) u.email = email;
+  return u;
+}
+const companyCode = name => { const w = String(name).normalize('NFD').replace(/[^A-Za-z0-9 ]/g, ' ').trim().toUpperCase().split(/\s+/).filter(Boolean); let base = (w.length > 1 ? w.map(x => x[0]).join('') : (w[0] || 'EMP')).slice(0, 4); if (base.length < 2) base = (w[0] || 'EMP').slice(0, 3); let code = base, i = 1; while (db.companies.some(c => c.code === code)) code = base.slice(0, 3) + (++i); return code; };
+function ensureCompany(batch, name) {
+  let c = findCompanyByText(name);
+  if (!c) { c = { id: nextId(), name: String(name).trim(), code: companyCode(name), nif: '', counter: 0, active: true }; db.companies.push(c); (batch.created.companies ||= []).push(c.id); log('create', 'company', c.id, null, `${c.name} (${c.code}) · Importação`); }
+  return c;
+}
+const BLANK_SERIAL = /^(n\/?a|na|-+|0+|none|null|sem|s\/n|sn|tbd|x+|\?+|nao tem|desconhecido|unknown)$/i;
+function ensureLoc(batch, name, companyId) {
+  let l = findLoc(name, companyId);
+  if (!l) { l = { id: nextId(), name: name.trim(), company: companyId }; db.locations.push(l); batch.created.locations.push(l.id); }
+  return l;
+}
+const snapshot = (batch, a) => { if (!batch.created.assets.includes(a.id) && !batch.updated.some(x => x.id === a.id)) batch.updated.push(JSON.parse(JSON.stringify(a))); };
+function newAsset(batch, companyId, modelId, extra) {
+  const a = { id: nextId(), company: companyId, model: modelId, status: 1, tag: nextTag(companyId), name: '', serial: '', purchaseDate: '', cost: '', warranty: '', location: null, assigned: null, expected: '', notes: '', custom: {}, created: new Date().toISOString(), ...extra };
+  db.assets.push(a); batch.created.assets.push(a.id); log('create', 'asset', a.id, null, 'Importação'); return a;
+}
+function assignTo(batch, a, type, id, note) { if (a.assigned?.type === type && a.assigned.id === id) return; snapshot(batch, a); a.assigned = { type, id }; a.lastCheckout = new Date().toISOString(); if (type === 'user') a.location = user(id)?.location || a.location; log('checkout', 'asset', a.id, a.assigned, note || 'Importação'); }
+
+function planRow(module, rec, ctx) {
+  if (module === 'snipeit') {
+    const c = norm(rec.category || '');
+    const hit = SNIPE_CATEGORY.find(([re]) => re.test(c));
+    const extraNotes = [rec.modelno ? 'Model Number: ' + rec.modelno : '', rec.order ? 'Encomenda: ' + rec.order : '', rec.notes || ''].filter(Boolean).join(' · ');
+    const base = { ...rec, status: rec.status && findStatus(rec.status) ? rec.status : undefined, notes: extraNotes || undefined, serial: rec.serial || rec.imei };
+    const nameIsPerson = !rec.assigned && !rec.email && looksPerson(rec.name);
+    if (nameIsPerson) base.assigned = rec.name;
+    let res;
+    if (!hit && rec.category && ctx.autoCreate) res = planRow('assets', base, ctx);
+    else if (!hit) res = planRow('assets', { ...base, category: undefined }, ctx), res.msgs.unshift(['warn', `Categoria "${rec.category || '—'}" desconhecida: entra como Portátil.`]);
+    else if (hit[1] === 'printer') res = planRow('printers', { ...base, hostname: rec.hostname || rec.name }, ctx);
+    else if (hit[1] === 'server' || hit[1] === 'nas') res = planRow('servers', { ...base, hostname: rec.hostname || rec.name || rec.tag, type: hit[1] === 'nas' ? 'NAS' : 'Servidor' }, ctx);
+    else res = planRow('assets', { ...base, category: hit[2] }, ctx);
+    if (nameIsPerson) res.msgs.unshift(['info', `"${rec.name}" no Asset Name parece uma pessoa: é ela que fica com o equipamento.`]);
+    if (rec.status && !findStatus(rec.status)) res.msgs.push(['warn', `Estado "${rec.status}" do Snipe-IT sem correspondência: fica Pronto.`]);
+    if (res.status === 'new' && res.msgs.some(m => m[0] === 'warn')) res.status = 'warn';
+    res.summary = `${hit ? hit[2] : (rec.category && ctx.autoCreate ? cap(rec.category) : 'Portátil')} · ${res.summary}`;
+    return res;
+  }
+  const msgs = [], warn = m => msgs.push(['warn', m]), err = m => msgs.push(['err', m]), info = m => msgs.push(['info', m]);
+  if (rec.serial && BLANK_SERIAL.test(String(rec.serial).trim())) rec = { ...rec, serial: '' };
+  const comp = rec.company ? findCompanyByText(rec.company) : company(ctx.defaultCompany);
+  const newCompany = rec.company && !comp && ctx.autoCreate && isAdmin() ? String(rec.company).trim() : null;
+  if (newCompany) { if (!ctx.creates.companies.has(norm(newCompany))) info(`Vai criar a empresa ${newCompany} (tags ${companyCode(newCompany)}-00001…).`); ctx.creates.companies.add(norm(newCompany)); }
+  else if (rec.company && !comp) err(`Empresa "${rec.company}" não existe. Cria-a em Empresas ou corrige o nome.`);
+  else if (comp && !myCompanies().includes(comp.id)) err(`Não tens acesso à empresa ${comp.name}.`);
+  let cid = comp?.id;
+  const needModel = (brand, mdl, kindCat) => {
+    if (!mdl) { err('Falta o modelo.'); return; }
+    if (!brand) { const g = guessBrand(mdl); if (g) { brand = rec.brand = g; info(`Marca deduzida pelo modelo: ${g}.`); } else { warn('Sem marca: fica marcado "Por completar" para preencheres depois.'); brand = rec.brand = 'Sem marca'; } }
+    const mk = findMaker(brand), md = mk && findModel(mk.id, mdl);
+    if (!md) { if (!ctx.autoCreate) err(`O modelo ${brand} ${mdl} não existe.`); else { if (!mk) ctx.creates.manufacturers.add(norm(brand)); ctx.creates.models.add(norm(brand + mdl)); info(`Vai criar o modelo ${brand} ${mdl}${kindCat ? ' (' + cat(kindCat).name + ')' : ''}.`); } }
+    return md;
+  };
+  const checkSerial = s => { if (!s) return; const k = norm(s); if (ctx.seenSerial.has(k)) err(`S/N ${s} repetido no ficheiro.`); ctx.seenSerial.add(k); };
+  let summary = '', outcome = 'new', apply = null;
+
+  if (module === 'assets' || module === 'printers' || module === 'servers') {
+    const def = IO[module];
+    let catId;
+    let newCat = null;
+    if (module === 'assets') { const c = rec.category && db.categories.find(x => norm(x.name) === norm(rec.category) && def.kinds.includes(x.kind)); if (rec.category && !c) { if (ctx.autoCreate) { newCat = cap(String(rec.category).trim()); info(`Vai criar a categoria ${newCat}.`); } else err(`Categoria "${rec.category}" não existe.`); } catId = c?.id || 1; }
+    if (module === 'printers') catId = 5;
+    if (module === 'servers') catId = /nas/i.test(rec.type || '') ? 7 : 6;
+    const md = needModel(rec.brand, rec.model, newCat ? null : catId);
+    if (rec.model && (norm(rec.model) === norm(rec.category || '') || db.categories.some(c => norm(c.name) === norm(rec.model)))) warn(`Modelo "${rec.model}" é genérico: fica marcado "Por completar".`);
+    const existing = (rec.tag && db.assets.find(a => !a.deleted && a.tag.toLowerCase() === rec.tag.toLowerCase())) || (rec.serial && db.assets.find(a => !a.deleted && a.serial && a.serial.toLowerCase() === rec.serial.toLowerCase()));
+    if (!rec.serial && !existing?.serial) warn('Sem n.º de série: fica marcado "Por completar" para preencheres depois.');
+    if (existing) { if (cid && existing.company !== cid) err(`O S/N/tag já existe na empresa ${company(existing.company).code} (${existing.tag}).`); else { outcome = 'update'; warn(`Já existe (${existing.tag}): vai ser atualizado.`); } }
+    if (!existing) checkSerial(rec.serial);
+    if (rec.tag) { if (ctx.seenTag.has(norm(rec.tag))) err(`Tag ${rec.tag} repetida no ficheiro.`); ctx.seenTag.add(norm(rec.tag)); }
+    const st0 = rec.status ? findStatus(rec.status) : status(1); if (rec.status && !st0) err(`Estado "${rec.status}" não existe.`);
+    if (rec.ip && !/^(\d{1,3}\.){3}\d{1,3}$/.test(rec.ip)) err(`IP inválido: ${rec.ip}.`);
+    if (rec.ip && db.assets.some(a => !a.deleted && a.custom.ip === rec.ip && a !== existing)) warn(`O IP ${rec.ip} já está noutro equipamento.`);
+    const purchase = rec.purchase ? parseDate(rec.purchase) : ''; if (rec.purchase && !purchase) warn(`Data de compra "${rec.purchase}" não reconhecida: ignorada.`);
+    const who = rec.assigned || rec.email;
+    const person = (rec.email && db.users.find(u => norm(u.email) === norm(rec.email))) || (rec.assigned ? findUserByText(rec.assigned, cid) : null);
+    const canAssign = (st0 || status(1)).type === 'deployable';
+    if (who && !person) { if (ctx.autoCreate) info(`Vai criar a pessoa ${rec.assigned || nameFromEmail(rec.email)}${rec.email ? ' (' + rec.email + ')' : ''} e atribuir-lhe o equipamento.`); else err(`Pessoa "${who}" não existe.`); }
+    else if (who && person) info(`Vai ser atribuído a ${uname(person)}.`);
+    if (who && !canAssign) warn(`Estado "${(st0 || status(1)).name}": a pessoa fica registada, mas o equipamento não é atribuído.`);
+    if (who && existing?.assigned && !(existing.assigned.type === 'user' && person && existing.assigned.id === person.id)) warn(`Já está atribuído a ${targetName(existing.assigned)}: mantém-se.`);
+    if (rec.location && !findLoc(rec.location, cid)) { if (ctx.autoCreate) info(`Vai criar a localização ${rec.location}.`); else err(`Localização "${rec.location}" não existe.`); }
+    summary = [module === 'assets' ? rec.serial : rec.hostname || rec.serial, [rec.brand, rec.model].filter(Boolean).join(' '), rec.ip, rec.assigned || rec.location, comp?.code].filter(Boolean).join(' · ');
+    apply = batch => {
+      if (newCat) { let c = db.categories.find(x => norm(x.name) === norm(newCat)); if (!c) { c = { id: nextId(), name: newCat, kind: 'device' }; db.categories.push(c); (batch.created.categories ||= []).push(c.id); } catId = c.id; }
+      const mdl = ensureModel(batch, rec.brand, rec.model, catId);
+      const custom = {};
+      if (rec.hostname) custom.hostname = rec.hostname; if (rec.ip) custom.ip = rec.ip;
+      ['tecnologia', 'cor', 'multifuncoes'].forEach(k => { if (rec[k]) custom[k] = cap(rec[k]); });
+      const data = { model: mdl.id, status: (st0 || status(1)).id, ...(rec.serial ? { serial: rec.serial } : {}), ...(rec.name || rec.hostname ? { name: rec.name || rec.hostname } : {}), ...(purchase ? { purchaseDate: purchase } : {}), ...(rec.cost ? { cost: +String(rec.cost).replace(',', '.').replace(/[^\d.]/g, '') } : {}), ...(rec.warranty ? { warranty: parseInt(rec.warranty) } : {}), ...(rec.notes ? { notes: rec.notes } : {}) };
+      if (rec.location) data.location = ensureLoc(batch, rec.location, cid).id;
+      let a;
+      if (existing) { snapshot(batch, existing); Object.assign(existing, data); existing.custom = { ...existing.custom, ...custom }; a = existing; log('update', 'asset', a.id, null, 'Importação'); }
+      else a = newAsset(batch, cid, mdl.id, { ...data, custom, ...(rec.tag ? { tag: rec.tag } : {}) });
+      if (who) { const u = ensureUser(batch, rec.assigned || '', cid, rec.email); if (!a.assigned && canAssign) assignTo(batch, a, 'user', u.id); }
+      else if (module !== 'assets' && data.location && !a.assigned) assignTo(batch, a, 'location', data.location, 'Instalado (importação)');
+    };
+  }
+
+  if (module === 'lines') {
+    const num = String(rec.numero || '').replace(/\D/g, '');
+    if (!/^9[1236]\d{7}$/.test(num)) err(`Número "${rec.numero || ''}" inválido: tem de ter 9 dígitos e começar por 91, 92, 93 ou 96.`);
+    if (ctx.seenNumber.has(num)) err(`Número ${num} repetido no ficheiro.`); ctx.seenNumber.add(num);
+    const existing = db.assets.find(a => !a.deleted && kindOf(a) === 'line' && a.custom.numero === num);
+    if (existing) { outcome = 'update'; if (cid && existing.company !== cid) warn(`A linha está na empresa ${company(existing.company).code}: mantém-se lá.`); }
+    let pin = rec.pin, puk = rec.puk;
+    if (rec.pinpuk) { const parts = rec.pinpuk.split(/[\/|;]/).map(x => x.replace(/\s/g, '')); pin = pin || parts[0]; puk = puk || parts[1]; }
+    if (pin && !/^\d{4,8}$/.test(pin)) { warn(`PIN "${pin}" inválido: vai para as notas.`); pin = ''; }
+    if (puk && !/^\d{8}$/.test(puk)) { warn(`PUK "${puk}" inválido: vai para as notas.`); puk = ''; }
+    const ph = parsePhone(rec.telemovel), imei = String(rec.imei || '').replace(/\D/g, '');
+    if (rec.imei && !luhn(imei)) warn(`IMEI ${rec.imei} não passa na verificação (Luhn). Confirma o número.`);
+    const phoneAsset = imei && db.assets.find(a => !a.deleted && a.serial === imei);
+    if (imei && !phoneAsset) { if (!ph) warn('IMEI sem modelo de telemóvel: o telemóvel é criado como "Telemóvel desconhecido".'); else if (!findMaker(ph.brand) || !findModel(findMaker(ph.brand).id, ph.model)) { if (ctx.autoCreate) info(`Vai criar o modelo ${ph.brand} ${ph.model}.`); else err(`O modelo ${ph.brand} ${ph.model} não existe.`); } }
+    if (imei && ctx.seenSerial.has(imei)) err(`IMEI ${imei} repetido no ficheiro.`); if (imei) ctx.seenSerial.add(imei);
+    if (ph && !imei) warn(`Telemóvel "${rec.telemovel}" sem IMEI: não é criado como equipamento, fica nas notas.`);
+    const notes = parseLineNotes(rec.notas);
+    if (notes.unknown) warn(`Notas "${notes.raw}" não reconhecidas: ficam como notas.`);
+    const person = rec.nome ? findUserByText(rec.nome, cid) : null;
+    if (rec.nome && !person) info(`Vai criar a pessoa ${rec.nome} (sem login).`);
+    if (phoneAsset?.assigned?.type === 'user' && person && phoneAsset.assigned.id !== person.id) warn(`O telemóvel ${imei} está com ${uname(user(phoneAsset.assigned.id))}: não é reatribuído.`);
+    summary = [num.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3'), rec.tarifario, rec.nome || 'livre', ph ? `${ph.brand} ${ph.model}${ph.isNew ? ' (novo)' : ''}` : '', imei, pin ? 'PIN ✓' : '', notes.acessorios, notes.portado ? 'portada de ' + notes.portado : '', comp?.code || (existing && company(existing.company).code)].filter(Boolean).join(' · ');
+    apply = batch => {
+      const lineCo = existing ? existing.company : cid;
+      const custom = { numero: num };
+      if (rec.tarifario) custom.tarifario = rec.tarifario.trim();
+      if (pin) custom.pin = pin; if (puk) custom.puk = puk;
+      if (notes.ativacao) custom.ativacao = notes.ativacao; if (notes.portado) custom.portado = notes.portado; if (notes.acessorios) custom.acessorios = notes.acessorios;
+      const extraNotes = [notes.unknown ? notes.raw : '', ph && !imei ? `Telemóvel: ${rec.telemovel}` : '', rec.pinpuk && !pin ? `PIN/PUK original: ${rec.pinpuk}` : ''].filter(Boolean).join(' · ');
+      let line;
+      if (existing) { snapshot(batch, existing); existing.custom = { ...existing.custom, ...custom }; if (extraNotes) existing.notes = [existing.notes, extraNotes].filter(Boolean).join(' · '); line = existing; log('update', 'asset', line.id, null, 'Importação'); }
+      else line = newAsset(batch, lineCo, db.models.find(m => cat(m.category).kind === 'line').id, { name: num.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3'), custom, notes: extraNotes });
+      const owner = rec.nome ? ensureUser(batch, rec.nome, lineCo) : null;
+      let phone = imei ? db.assets.find(a => !a.deleted && a.serial === imei) : null;
+      if (imei && !phone) { const mdl = ph ? ensureModel(batch, ph.brand, ph.model, 4) : ensureModel(batch, 'Desconhecida', 'Telemóvel desconhecido', 4); phone = newAsset(batch, lineCo, mdl.id, { serial: imei, ...(ph?.date ? { purchaseDate: ph.date } : notes.accDate ? { purchaseDate: notes.accDate } : {}), notes: ph?.isNew || notes.accNew ? 'Entregue novo' : '' }); }
+      if (phone) { if (owner && (!phone.assigned || phone.assigned.type !== 'user')) assignTo(batch, phone, 'user', owner.id); assignTo(batch, line, 'asset', phone.id); }
+      else if (owner) assignTo(batch, line, 'user', owner.id);
+    };
+  }
+
+  if (module === 'accessories') {
+    if (!rec.name) err('Falta o nome.');
+    const qty = parseInt(rec.qty || '0'), min = parseInt(rec.min || '0');
+    if (rec.qty && isNaN(qty)) err(`Quantidade "${rec.qty}" inválida.`);
+    const existing = db.accessories.find(x => norm(x.name) === norm(rec.name) && x.company === cid);
+    if (existing) { outcome = 'update'; warn(`Já existe: a quantidade passa de ${existing.qty} para ${qty}.`); if (qty < accOpen(existing).length) err('A quantidade não pode ser menor do que as unidades entregues.'); }
+    summary = [rec.name, rec.category, `${qty} un.`, comp?.code].filter(Boolean).join(' · ');
+    apply = batch => { if (existing) { batch.updatedAcc.push({ ...existing }); Object.assign(existing, { qty, min: rec.min ? min : existing.min, category: rec.category || existing.category }); log('update', 'accessory', existing.id, null, 'Importação'); } else { const x = { id: nextId(), company: cid, name: rec.name, category: rec.category || 'Outros', qty, min }; db.accessories.push(x); batch.created.accessories.push(x.id); log('create', 'accessory', x.id, null, 'Importação'); } };
+  }
+
+  if (module === 'users') {
+    let first = rec.first, last = rec.last; if (!first && rec.full) { const p = rec.full.trim().split(/\s+/); first = p[0]; last = p.slice(1).join(' '); }
+    if (!first) err('Falta o nome.');
+    if (rec.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(rec.email)) err(`E-mail "${rec.email}" inválido.`);
+    const existing = rec.email ? db.users.find(u => u.email && u.email.toLowerCase() === rec.email.toLowerCase()) : db.users.find(u => norm(uname(u)) === norm(`${first} ${last || ''}`));
+    if (existing) { outcome = 'update'; warn('Já existe: vai ser atualizado.'); }
+    summary = [`${first || ''} ${last || ''}`.trim(), rec.email, comp?.code].filter(Boolean).join(' · ');
+    apply = batch => { if (existing) { batch.updatedUsers.push({ ...existing }); Object.assign(existing, { first, last: last || existing.last, email: rec.email || existing.email, company: cid ?? existing.company }); log('update', 'user', existing.id, null, 'Importação'); } else { const u = { id: nextId(), first, last: last || '', email: rec.email || '', company: cid, active: true }; db.users.push(u); batch.created.users.push(u.id); log('create', 'user', u.id, null, 'Importação'); } };
+  }
+
+  if (msgs.some(m => m[0] === 'err')) outcome = 'error';
+  if (newCompany && apply) { const inner = apply; apply = batch => { cid = ensureCompany(batch, newCompany).id; inner(batch); }; }
+  else if (outcome === 'new' && msgs.some(m => m[0] === 'warn')) outcome = 'warn';
+  return { status: outcome, summary, msgs, apply };
+}
+
+function impState() {
+  if (!st.imp) st.imp = { tab: 'import', module: 'lines', company: db.ui.company !== 'all' ? db.ui.company : myCompanies()[0], text: '', fileName: '', step: 'input', map: [], parsed: null, autoCreate: true, exModule: 'assets', exSecrets: false };
+  return st.imp;
+}
+function runPlan(s) {
+  const ctx = importCtx(+s.company, s.autoCreate);
+  const KEYS = { assets: ['tag', 'serial', 'model', 'name'], snipeit: ['tag', 'serial', 'model', 'name', 'imei'], printers: ['hostname', 'serial', 'model', 'ip'], servers: ['hostname', 'serial', 'model', 'ip'], lines: ['numero'], accessories: ['name'], users: ['first', 'last', 'email', 'full'] }[s.module];
+  return s.parsed.rows.map((r, i) => { const rec = {}; s.map.forEach((f, j) => { const v = r[j] == null ? '' : String(r[j]).trim(); if (f && v) rec[f] = v; }); return KEYS.some(k => rec[k]) ? { n: i + 2, ...planRow(s.module, rec, ctx) } : null; }).filter(Boolean);
+}
+const IMP_STATUS = { new: ['Novo', '#16A34A'], update: ['Atualiza', 'var(--accent)'], warn: ['Novo, com aviso', '#EA580C'], error: ['Erro', '#B91C1C'] };
+
+function exportRows(module) {
+  const inC = a => inScope(a.company), ast = k => db.assets.filter(a => !a.deleted && inC(a) && k.includes(kindOf(a)));
+  const secrets = impState().exSecrets && isAdmin();
+  if (module === 'assets') return [['Empresa', 'Asset tag', 'Nome', 'Marca', 'Modelo', 'Categoria', 'S/N / IMEI', 'Estado', 'Atribuído a', 'Localização', 'Data de compra', 'Custo', 'Garantia (meses)', 'Fim da garantia', 'Notas'], ...ast(['device', 'phone']).map(a => [company(a.company).code, a.tag, a.name, maker(model(a.model).manufacturer).name, model(a.model).name, cat(model(a.model).category).name, a.serial, isAssigned(a) ? 'Atribuído' : status(a.status).name, targetName(a.assigned) === '—' ? '' : targetName(a.assigned), loc(a.location)?.name || '', fmt(a.purchaseDate).replace('—', ''), a.cost, a.warranty, fmt(warrantyEnd(a)).replace('—', ''), a.notes])];
+  if (module === 'printers') return [['Empresa', 'Asset tag', 'Nome', 'Marca', 'Modelo', 'S/N', 'IP', 'Tecnologia', 'Cor', 'Multifunções', 'Localização', 'Estado'], ...ast(['printer']).map(a => [company(a.company).code, a.tag, a.custom.hostname || a.name, maker(model(a.model).manufacturer).name, model(a.model).name, a.serial, a.custom.ip, a.custom.tecnologia, a.custom.cor, a.custom.multifuncoes, loc(a.location)?.name || '', status(a.status).name])];
+  if (module === 'servers') return [['Empresa', 'Nome', 'Tipo', 'Marca', 'Modelo', 'S/N', 'IP', 'Localização'], ...ast(['server', 'nas']).map(a => [company(a.company).code, a.custom.hostname || a.name, kindOf(a) === 'nas' ? 'NAS' : 'Servidor', maker(model(a.model).manufacturer).name, model(a.model).name, a.serial, a.custom.ip, loc(a.location)?.name || ''])];
+  if (module === 'lines') return [['Empresa', 'Tarifário', 'Nº telefone', 'Nome', ...(secrets ? ['PIN', 'PUK'] : []), 'Telemóvel', 'IMEI', 'Data ativação', 'Portada de', 'Acessórios'], ...ast(['line']).map(a => { const p = phoneOfLine(a), o = ownerOfLine(a); return [company(a.company).code, a.custom.tarifario, a.custom.numero, o ? uname(o) : '', ...(secrets ? [a.custom.pin || '', a.custom.puk || ''] : []), p ? modelLabel(p.model) : '', p?.serial || '', fmt(a.custom.ativacao).replace('—', ''), a.custom.portado || '', a.custom.acessorios || '']; })];
+  if (module === 'accessories') return [['Empresa', 'Nome', 'Categoria', 'Quantidade', 'Entregues', 'Disponíveis', 'Stock mínimo'], ...db.accessories.filter(x => inScope(x.company)).map(x => [company(x.company).code, x.name, x.category, x.qty, accOpen(x).length, accAvail(x), x.min])];
+  if (module === 'users') return [['Empresa', 'Nome', 'Apelido', 'E-mail', 'Login', 'Assets', 'Acessórios', 'Estado'], ...db.users.filter(u => u.company == null ? isAdmin() : inScope(u.company)).map(u => [company(u.company)?.code || '', u.first, u.last, u.email || '', u.login ? ROLE_LABEL[u.role] : 'Sem login', userItems(u).assets.length, userItems(u).acc.length, u.active ? 'Ativo' : 'Inativo'])];
+  if (module === 'history') return [['Data', 'Ação', 'Item', 'Destino', 'Por', 'Nota'], ...visibleLogs().map(l => [fmtDT(l.at), ACTIONS[l.action]?.[0] || l.action, l.itemType === 'asset' ? asset(l.itemId)?.tag : l.itemType, l.targetType ? targetName({ type: l.targetType, id: l.targetId }) : '', uname(user(l.by)), l.note])];
+  return [];
+}
+const toCSV = rows => '﻿' + rows.map(r => r.map(v => { const s = String(v ?? ''); return /[;"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; }).join(';')).join('\r\n');
+
+function pageImportar() {
+  const s = impState();
+  const tabsHtml = `<div class="tabs" role="tablist">${[['import', 'Importar'], ['export', 'Exportar'], ['batches', `Importações feitas (${(db.imports || []).length})`]].map(([id, l]) => `<button role="tab" aria-selected="${s.tab === id}" class="${s.tab === id ? 'on' : ''}" data-act="imp-tab" data-id="${id}">${l}</button>`).join('')}</div>`;
+  const head = `<div class="row between"><div><h1>Importar / Exportar</h1><div class="muted">CSV ou Excel, por empresa. Cola diretamente as linhas copiadas do Excel.</div></div></div>${tabsHtml}`;
+  if (s.tab === 'export') return head + pageExport(s);
+  if (s.tab === 'batches') return head + pageBatches();
+  if (!canWrite()) return head + '<div class="warnbox">O teu perfil só permite exportar.</div>';
+  const modSel = `<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">${Object.entries(IO).map(([k, d]) => `<button class="pick ${s.module === k ? 'on' : ''}" data-act="imp-module" data-id="${k}" aria-pressed="${s.module === k}"><b>${d.label}</b><span class="small muted">${d.fields.length} colunas</span></button>`).join('')}</div>`;
+  if (s.step === 'input') return head + `<section class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div class="row"><span class="step" style="background:var(--accent)">1</span><h2>O que vais importar?</h2></div>${modSel}
+    ${layoutGuide(s.module)}
+    ${s.module === 'lines' ? '<div class="notice">Aceita o teu Excel tal como está (Tarifários, Nrº Telefone, Nome, PIN/PUK, Telemóvel, IMEI, Data Ativação). O PIN/PUK é separado, o telemóvel é criado pelo IMEI e as notas ("Capa + Película - NOVO 13/01/2025", "Portado da …") são lidas.</div>' : ''}
+    <div class="form-grid"><label class="f">Empresa por defeito (quando o ficheiro não tem a coluna Empresa)<select data-imp="company">${db.companies.filter(c => myCompanies().includes(c.id) && c.active !== false).map(c => `<option value="${c.id}" ${+s.company === c.id ? 'selected' : ''}>${esc(c.name)} (${c.code})</option>`).join('')}</select></label></div>
+    <div class="row"><span class="step" style="background:var(--accent)">2</span><h2>Dados</h2></div>
+    <div class="row"><label class="btn" style="cursor:pointer">Escolher ficheiro CSV<input type="file" accept=".csv,.txt,.tsv,.xlsx,.xls" data-imp-file style="display:none"></label><button class="btn" data-act="imp-sample">Carregar exemplo</button><button class="btn" data-act="imp-template">Copiar modelo de colunas</button>${s.fileName ? `<span class="small muted">${esc(s.fileName)}</span>` : ''}</div>
+    <label class="f">…ou cola aqui as linhas copiadas do Excel, com o cabeçalho<textarea id="imp-text" data-imp="text" rows="9" class="mono" placeholder="Seleciona as células no Excel (incluindo a linha de títulos), copia e cola aqui.">${esc(s.text)}</textarea></label>
+    <div class="row"><button class="btn primary" data-act="imp-next" ${s.text.trim() ? '' : 'disabled'}>Continuar</button><span class="small muted">${s.text.trim() ? plural(parseDelimited(s.text).rows.length, 'linha', 'linhas') + ' detetadas' : ''}</span></div>
+  </section>`;
+  if (s.step === 'map') {
+    const defs = IO[s.module].fields;
+    return head + `<section class="card" style="display:flex;flex-direction:column;gap:14px"><div class="row between"><div class="row"><span class="step" style="background:var(--accent)">3</span><h2>Colunas · ${IO[s.module].label}</h2></div><span class="small muted">Reconhecidas automaticamente. Corrige o que estiver errado.</span></div>
+    <div class="tablebox"><table><thead><tr><th>Coluna no ficheiro</th><th>Exemplo</th><th>Vai para</th></tr></thead><tbody>
+    ${s.parsed.headers.map((h, i) => `<tr><td style="font-weight:600">${esc(h || '(sem título)')}</td><td class="mono small muted">${esc(s.parsed.rows[0]?.[i] || '')}</td><td><select data-imp-map="${i}" aria-label="Destino de ${esc(h)}"><option value="">Ignorar</option>${defs.map(([k, l]) => `<option value="${k}" ${s.map[i] === k ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>
+    <div class="row"><button class="btn" data-act="imp-back" data-to="input">Voltar</button><button class="btn primary" data-act="imp-preview">Pré-visualizar</button></div></section>`;
+  }
+  if (s.step === 'preview') {
+    const plan = runPlan(s), cnt = k => plan.filter(p => p.status === k).length, ok = plan.filter(p => p.status !== 'error').length;
+    return head + `<section class="card" style="display:flex;flex-direction:column;gap:14px"><div class="row between"><div class="row"><span class="step" style="background:var(--accent)">4</span><h2>Pré-visualização · ${IO[s.module].label}</h2></div>
+    <div class="row">${Object.entries(IMP_STATUS).map(([k, [l, c]]) => `<span class="chip"><span class="dot" style="background:${c}"></span>${l}: ${cnt(k)}</span>`).join('')}</div></div>
+    <label class="row" style="gap:8px"><input type="checkbox" data-imp-check="autoCreate" ${s.autoCreate ? 'checked' : ''} style="width:18px;height:18px"> Criar automaticamente marcas, modelos, pessoas e localizações que não existam</label>
+    <div class="tablebox"><table style="min-width:820px"><thead><tr><th>Linha</th><th>Resultado</th><th>Dados</th><th>Mensagens</th></tr></thead><tbody>
+    ${plan.map(p => `<tr style="${p.status === 'error' ? 'background:rgba(185,28,28,.06)' : p.status === 'warn' ? 'background:rgba(234,88,12,.06)' : ''}"><td class="muted">${p.n}</td><td><span class="chip"><span class="dot" style="background:${IMP_STATUS[p.status][1]}"></span>${IMP_STATUS[p.status][0]}</span></td><td>${esc(p.summary)}</td><td class="small">${p.msgs.map(([t, m]) => `<div style="color:${t === 'err' ? 'var(--danger)' : t === 'warn' ? 'var(--warn)' : 'var(--muted)'}">${esc(m)}</div>`).join('') || '<span class="muted">—</span>'}</td></tr>`).join('')}</tbody></table></div>
+    <div class="row"><button class="btn" data-act="imp-back" data-to="map">Voltar</button><button class="btn primary" data-act="imp-run" ${ok ? '' : 'disabled'}>Importar ${plural(ok, 'linha', 'linhas')}</button>${cnt('error') ? `<span class="small muted">${plural(cnt('error'), 'linha com erro fica', 'linhas com erro ficam')} de fora.</span>` : ''}</div></section>`;
+  }
+  if (s.step === 'done') {
+    const b = s.result;
+    return head + `<section class="card" style="display:flex;flex-direction:column;gap:12px"><h2>Importação concluída</h2>
+    <div class="row">${[['Linhas importadas', b.ok], ['Com erro (ignoradas)', b.errors], ['Equipamentos criados', b.created.assets.length], ['Atualizados', b.updated.length + b.updatedAcc.length + b.updatedUsers.length], ['Pessoas criadas', b.created.users.length], ['Modelos criados', b.created.models.length]].map(([l, n]) => `<div class="card kpi" style="padding:12px 16px;flex:1 1 150px"><span class="l">${l}</span><span class="n" style="font-size:22px">${n}</span></div>`).join('')}</div>
+    <div class="row"><a class="btn primary" href="#${{ assets: 'assets', snipeit: 'assets', printers: 'impressoras', servers: 'servidores', lines: 'linhas', accessories: 'acessorios', users: 'utilizadores' }[b.module]}">Ver ${IO[b.module].label.toLowerCase()}</a><button class="btn" data-act="imp-undo" data-id="${b.id}">Anular esta importação</button><button class="btn" data-act="imp-new">Nova importação</button></div></section>`;
+  }
+  return head;
+}
+function layoutGuide(module) {
+  if (module === 'snipeit') return `<div class="card" style="background:var(--surface2);box-shadow:none;display:flex;flex-direction:column;gap:12px">
+    <div class="row between"><h3>Layout do ficheiro do Snipe-IT</h3><div class="row"><button class="btn sm" data-act="imp-template">Copiar cabeçalho Snipe-IT</button><button class="btn sm" data-act="imp-sample">Carregar exemplo</button></div></div>
+    <ol class="small" style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;color:var(--text2)">
+      <li>No Snipe-IT, abre <b>Assets → Todos</b>, escolhe as colunas no ícone de colunas e carrega em <b>Exportar → CSV</b> (ou usa <b>Relatórios → Relatório personalizado</b> e marca as colunas da tabela abaixo).</li>
+      <li>Não é preciso mudar nada no ficheiro: os nomes das colunas em inglês são reconhecidos sozinhos.</li>
+      <li>Cada linha vai para a secção certa pela <b>Category</b>. Utilizadores e acessórios exportados do Snipe-IT importam-se nas opções Utilizadores e Acessórios.</li>
+    </ol>
+    <div class="tablebox"><table style="min-width:760px"><thead><tr><th>Coluna no Snipe-IT</th><th>Vai para</th><th>Obrigatória</th><th>Exemplo</th><th>Notas</th></tr></thead><tbody>
+    ${SNIPE_LAYOUT.map(([a, b, c, d, e]) => `<tr><td class="mono" style="font-weight:600">${esc(a)}</td><td>${esc(b)}</td><td>${c === 'Sim' ? '<span class="chip status" style="--c:#2563EB">Sim</span>' : `<span class="small muted">${esc(c)}</span>`}</td><td class="mono small">${esc(d)}</td><td class="small muted">${esc(e)}</td></tr>`).join('')}</tbody></table></div></div>`;
+  const extra = { users: 'Também aceita o ficheiro de utilizadores do Snipe-IT (First Name, Last Name, Email, Company).', accessories: 'Também aceita o ficheiro de acessórios do Snipe-IT (Item Name, Category, Quantity, Min. QTY, Company).', assets: 'Também aceita os nomes das colunas do Snipe-IT; para um ficheiro completo do Snipe-IT usa a opção “Snipe-IT (assets)”.' }[module];
+  return `<details class="card" style="background:var(--surface2);box-shadow:none"><summary style="cursor:pointer;font-weight:600">Layout do ficheiro: colunas aceites (${IO[module].fields.length})</summary>
+    <div class="row" style="margin-top:10px;gap:6px">${IO[module].fields.map(([, label]) => `<span class="chip">${esc(label)}</span>`).join('')}</div>${extra ? `<p class="small muted" style="margin:10px 0 0">${esc(extra)}</p>` : ''}</details>`;
+}
+function pageExport(s) {
+  const mods = { assets: 'Assets', printers: 'Impressoras', servers: 'Servidores e NAS', lines: 'Linhas móveis', accessories: 'Acessórios', users: 'Utilizadores', history: 'Histórico' };
+  const rows = exportRows(s.exModule);
+  return `<section class="card" style="display:flex;flex-direction:column;gap:14px">
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">${Object.entries(mods).map(([k, l]) => `<button class="pick ${s.exModule === k ? 'on' : ''}" data-act="ex-module" data-id="${k}"><b>${l}</b></button>`).join('')}</div>
+    <div class="row"><span class="muted">Empresa: <b>${db.ui.company === 'all' ? 'todas as minhas empresas' : esc(company(db.ui.company).name)}</b> (muda no seletor de cima) · ${plural(rows.length - 1, 'registo', 'registos')}</span>
+    ${s.exModule === 'lines' && isAdmin() ? `<label class="row" style="gap:6px"><input type="checkbox" data-imp-check="exSecrets" ${s.exSecrets ? 'checked' : ''} style="width:18px;height:18px"> Incluir PIN/PUK (fica registado no histórico)</label>` : ''}</div>
+    <div class="row"><button class="btn primary" data-act="ex-copy">Copiar CSV</button><button class="btn" data-act="ex-copy" data-tsv="1">Copiar para colar no Excel</button><span class="small muted">Na aplicação real há também os botões “Descarregar CSV” e “Descarregar Excel (.xlsx)”.</span></div>
+    ${rows.length > 1 ? `<div class="tablebox"><table style="min-width:900px"><thead><tr>${rows[0].map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.slice(1, 16).map(r => `<tr>${r.map(v => `<td class="small">${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${rows.length > 16 ? `<span class="small muted">A mostrar 15 de ${rows.length - 1}.</span>` : ''}` : '<div class="empty">Nada para exportar.</div>'}
+  </section>`;
+}
+function pageBatches() {
+  const list = [...(db.imports || [])].reverse();
+  return `<section class="card">${list.length ? `<div class="tablebox"><table><thead><tr><th>Quando</th><th>O quê</th><th>Por</th><th>Resultado</th><th></th></tr></thead><tbody>${list.map(b => `<tr><td class="muted">${fmtDT(b.at)}</td><td>${esc(IO[b.module].label)}</td><td>${esc(uname(user(b.by)))}</td><td class="small">${b.ok} importadas · ${b.created.assets.length} criados · ${b.updated.length + b.updatedAcc.length + b.updatedUsers.length} atualizados${b.errors ? ` · ${b.errors} com erro` : ''}</td><td style="text-align:right">${b.undone ? '<span class="chip">Anulada</span>' : (canWrite() ? `<button class="btn sm" data-act="imp-undo" data-id="${b.id}">Anular</button>` : '')}</td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">Ainda não fizeste importações.</div>'}</section>`;
+}
+function undoImport(id) {
+  const b = (db.imports || []).find(x => x.id === id); if (!b || b.undone) return;
+  const del = new Set(b.created.assets);
+  db.assets = db.assets.filter(a => !del.has(a.id));
+  b.updated.forEach(old => { const i = db.assets.findIndex(a => a.id === old.id); if (i >= 0) db.assets[i] = old; });
+  db.assets.forEach(a => { if (a.assigned?.type === 'asset' && del.has(a.assigned.id)) a.assigned = null; });
+  db.accessories = db.accessories.filter(x => !b.created.accessories.includes(x.id));
+  b.updatedAcc.forEach(old => { const i = db.accessories.findIndex(x => x.id === old.id); if (i >= 0) db.accessories[i] = old; });
+  const usedUsers = new Set(db.assets.filter(a => a.assigned?.type === 'user').map(a => a.assigned.id));
+  db.users = db.users.filter(u => !b.created.users.includes(u.id) || usedUsers.has(u.id));
+  b.updatedUsers.forEach(old => { const i = db.users.findIndex(u => u.id === old.id); if (i >= 0) db.users[i] = old; });
+  const usedModels = new Set(db.assets.map(a => a.model));
+  db.models = db.models.filter(m => !b.created.models.includes(m.id) || usedModels.has(m.id));
+  db.manufacturers = db.manufacturers.filter(m => !b.created.manufacturers.includes(m.id) || db.models.some(x => x.manufacturer === m.id));
+  db.locations = db.locations.filter(l => !b.created.locations.includes(l.id) || db.assets.some(a => a.location === l.id));
+  db.categories = db.categories.filter(c => !(b.created.categories || []).includes(c.id) || db.models.some(m => m.category === c.id));
+  db.companies = db.companies.filter(c => !(b.created.companies || []).includes(c.id) || companyUsage(c.id));
+  b.undone = true; log('update', 'import', b.id, null, `Importação de ${IO[b.module].label} anulada`);
+}
+
+function pageHistorico() {
+  const logs = visibleLogs().filter(l => matches('historico', l.action, ACTIONS[l.action]?.[0], l.note, l.itemType === 'asset' ? asset(l.itemId)?.tag : '', uname(user(l.by))));
+  return `<div class="row between"><div><h1>Histórico</h1><div class="muted">Tudo o que acontece fica registado e nunca se apaga</div></div>${searchBox('historico', 'Ação, tag, pessoa…')}</div><section class="card">${logTable(logs)}</section>`;
+}
+
+const FIELD_DEFS = {
+  printer: [['hostname', 'Hostname'], ['ip', 'Endereço IP'], ['tecnologia', 'Tecnologia', ['Laser', 'Jato de tinta']], ['cor', 'Cor', ['Cor', 'Mono']], ['multifuncoes', 'Multifunções', ['Sim', 'Não']]],
+  server: [['hostname', 'Nome (hostname)'], ['ip', 'Endereço IP']],
+  nas: [['hostname', 'Nome (hostname)'], ['ip', 'Endereço IP']],
+  line: [['numero', 'Número de telefone'], ['tarifario', 'Tarifário', ['Biz Standard', 'Biz Max']], ['pin', 'PIN', null, true], ['puk', 'PUK', null, true], ['ativacao', 'Data de ativação'], ['portado', 'Portado de'], ['acessorios', 'Acessórios entregues']]
+};
+
+function pageAssetDetail(a) {
+  const k = kindOf(a), back = PAGE_OF_KIND[k], defs = FIELD_DEFS[k] || [];
+  const children = db.assets.filter(x => !x.deleted && x.assigned?.type === 'asset' && x.assigned.id === a.id);
+  const logs = db.logs.filter(l => l.itemType === 'asset' && l.itemId === a.id).sort((x, y) => y.at.localeCompare(x.at));
+  const w = warrantyEnd(a);
+  return `<div><a href="#${back}" data-act="close-detail" data-page="${back}">← ${esc(NAV.find(n => n[0] === back)[1])}</a></div>
+  <div class="row between"><div><div class="row"><h1 class="mono" style="font-size:22px">${esc(a.tag)}</h1>${statusChip(a)}${companyChip(a.company)}</div><div class="muted" style="margin-top:4px">${esc(a.name ? a.name + ' · ' : '')}${esc(modelLabel(a.model))} · ${esc(cat(model(a.model).category).name)}</div></div>
+  ${canWrite() && !a.deleted ? `<div class="row">${isAssigned(a) ? `<button class="btn primary" data-act="checkin" data-id="${a.id}">Check-in</button>` : `<button class="btn primary" data-act="checkout" data-id="${a.id}">Check-out</button>`}<button class="btn" data-act="edit-asset" data-id="${a.id}">Editar</button><button class="btn" data-act="status" data-id="${a.id}">Mudar estado</button><button class="btn" data-act="transfer" data-id="${a.id}">Mudar de empresa</button>${isAdmin() ? `<button class="btn danger" data-act="delete" data-id="${a.id}">Apagar</button>` : ''}</div>` : ''}</div>
+  ${a.deleted ? '<div class="warnbox">Este asset foi apagado. O histórico mantém-se.</div>' : ''}
+  ${!a.deleted && missing(a).length ? `<div class="todobox"><span>⚠ <b>Por completar.</b> Falta: ${esc(missing(a).join(', '))}.</span>${canWrite() ? `<button class="btn sm" data-act="edit-asset" data-id="${a.id}">Completar agora</button>` : ''}</div>` : ''}
+  <div class="grid3">
+    <section class="card"><h2 style="margin-bottom:12px">Detalhes</h2><dl class="kv">
+      <dt>Atribuído a</dt><dd>${a.assigned ? `${esc(targetName(a.assigned))} <span class="small muted">(${a.assigned.type === 'user' ? 'pessoa' : a.assigned.type === 'location' ? 'localização' : 'asset'})</span>` : '—'}</dd>
+      <dt>${k === 'phone' ? 'IMEI' : 'N.º de série'}</dt><dd class="mono">${esc(a.serial || '—')}</dd>
+      <dt>Localização</dt><dd>${esc(loc(a.location)?.name || '—')}</dd>
+      <dt>Devolução prevista</dt><dd style="color:${a.expected && a.expected < today() && a.assigned ? 'var(--danger)' : 'inherit'}">${fmt(a.expected)}</dd>
+      <dt>Compra</dt><dd>${fmt(a.purchaseDate)} · ${money(a.cost)}</dd>
+      <dt>Garantia</dt><dd>${a.warranty ? `${a.warranty} meses, até ${fmt(w)}` : '—'}</dd>
+      <dt>Notas</dt><dd>${esc(a.notes || '—')}</dd>
+    </dl></section>
+    ${defs.length ? `<section class="card"><h2 style="margin-bottom:12px">Campos de ${esc(cat(model(a.model).category).name.toLowerCase())}</h2><dl class="kv">${defs.map(([key, label, , enc]) => `<dt>${esc(label)}${enc ? ' 🔒' : ''}</dt><dd class="${['ip', 'hostname', 'numero', 'pin', 'puk'].includes(key) ? 'mono' : ''}">${enc ? (a.custom[key] ? (st.revealed[a.id] ? esc(a.custom[key]) : '••••••••') : '—') : esc(key === 'ativacao' ? fmt(a.custom[key]) : (a.custom[key] || '—'))}</dd>`).join('')}</dl>
+      ${defs.some(d => d[3]) && (a.custom.pin || a.custom.puk) && me().role !== 'leitura' ? `<div style="margin-top:12px"><button class="btn sm" data-act="reveal" data-id="${a.id}">${st.revealed[a.id] ? 'Esconder PIN/PUK' : 'Mostrar PIN/PUK'}</button></div>` : ''}</section>` : ''}
+    ${children.length ? `<section class="card"><h2 style="margin-bottom:12px">Atribuído a este asset</h2>${children.map(c => `<div style="padding:8px 0;border-top:1px solid var(--divider)"><a data-act="open-asset" data-id="${c.id}" class="mono">${esc(c.name || c.tag)}</a> <span class="muted">· ${esc(cat(model(c.model).category).name)}</span></div>`).join('')}</section>` : ''}
+  </div>
+  <section class="card"><h2 style="margin-bottom:6px">Histórico</h2>${logTable(logs)}</section>`;
+}
+
+function newForm() {
+  if (!st.nf) st.nf = { company: db.ui.company !== 'all' ? db.ui.company : myCompanies()[0], q: '', brand: null, model: null, newModel: false, nmName: '', nmCat: 1, serial: '', serials: '', multi: false, status: 1, location: '', copy: true, msg: '' };
+  return st.nf;
+}
+function pageNovo() {
+  if (!canWrite()) return '<div class="warnbox">O teu perfil não permite criar assets.</div>';
+  const f = newForm();
+  const brands = db.manufacturers.filter(m => db.models.some(x => x.manufacturer === m.id && ['device', 'phone'].includes(cat(x.category).kind)) || !db.models.some(x => x.manufacturer === m.id));
+  const q = f.q.trim().toLowerCase();
+  const found = brands.filter(b => !q || b.name.toLowerCase().includes(q));
+  const brand = f.brand && maker(f.brand);
+  const models = brand ? db.models.filter(m => m.manufacturer === brand.id && ['device', 'phone'].includes(cat(m.category).kind)) : [];
+  const mdl = f.model && model(f.model);
+  const comp = company(f.company);
+  const serials = f.multi ? f.serials.split('\n').map(s => s.trim()).filter(Boolean) : (f.serial.trim() ? [f.serial.trim()] : []);
+  const dups = serials.filter(s => db.assets.some(a => a.serial && a.serial.toLowerCase() === s.toLowerCase()));
+  const last = mdl && [...db.assets].reverse().find(a => a.model === mdl.id && a.purchaseDate);
+  const preview = `${comp.code}-${String(comp.counter + 1).padStart(5, '0')}`;
+  const stepColor = (done, active) => done ? '#16A34A' : active ? 'var(--accent)' : '#9CA3AF';
+  const locs = db.locations.filter(l => l.company == null || l.company === f.company);
+  return `<div><a href="#assets">← Assets</a></div><div class="row between"><h1>Novo asset</h1><span class="muted">Marca → modelo → S/N. O resto é preenchido sozinho.</span></div>
+  ${f.msg ? `<div class="notice" role="status">${esc(f.msg)}</div>` : ''}
+  <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start">
+  <div style="flex:999 1 520px;min-width:0;display:flex;flex-direction:column;gap:14px">
+    <section class="card row"><label class="f" style="flex:1 1 260px">Empresa dona do material<select id="nf-company" data-nf="company">${db.companies.filter(c => myCompanies().includes(c.id) && c.active !== false).map(c => `<option value="${c.id}" ${c.id === f.company ? 'selected' : ''}>${esc(c.name)} (${c.code})</option>`).join('')}</select></label><span class="small muted" style="flex:1 1 220px">Define o prefixo da tag e as localizações. Marcas e modelos são comuns a todas.</span></section>
+    <section class="card" style="display:flex;flex-direction:column;gap:12px"><div class="row"><span class="step" style="background:${stepColor(brand, !brand)}">1</span><h2>Marca</h2></div>
+      ${brand ? `<div class="row between notice"><b>${esc(brand.name)}</b><button class="btn sm" data-act="nf-clear-brand">Alterar</button></div>` : `
+      <label class="f">Escreve a marca<input id="nf-q" data-nf="q" value="${esc(f.q)}" placeholder="ex.: Lenovo, Dell, HP…" autocomplete="off"></label>
+      <div class="row">${found.map(b => `<button class="pill" data-act="nf-brand" data-id="${b.id}">${esc(b.name)} <span class="muted">· ${db.models.filter(m => m.manufacturer === b.id && ['device', 'phone'].includes(cat(m.category).kind)).length} modelos</span></button>`).join('')}
+      ${q.length > 1 && !brands.some(b => b.name.toLowerCase() === q) && !db.manufacturers.some(b => b.name.toLowerCase() === q) ? `<button class="pill btn dashed" data-act="nf-new-brand">+ Criar marca “${esc(f.q.trim())}”</button>` : ''}</div>`}
+    </section>
+    <section class="card" style="display:flex;flex-direction:column;gap:12px;opacity:${brand ? 1 : .55}"><div class="row between"><div class="row"><span class="step" style="background:${stepColor(mdl, brand && !mdl)}">2</span><h2>Modelo</h2></div>${brand && !f.newModel ? '<button class="btn sm dashed" data-act="nf-open-model">+ Novo modelo</button>' : ''}</div>
+      ${!brand ? '<p class="muted" style="margin:0">Escolhe primeiro a marca para veres os modelos dela.</p>' : ''}
+      ${models.length ? `<div style="display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))">${models.map(m => `<button class="pick ${f.model === m.id ? 'on' : ''}" data-act="nf-model" data-id="${m.id}" aria-pressed="${f.model === m.id}"><b>${esc(m.name)}</b><span class="small muted">${esc(cat(m.category).name)} · ${db.assets.filter(a => a.model === m.id && !a.deleted).length} em inventário</span></button>`).join('')}</div>` : ''}
+      ${brand && !models.length && !f.newModel ? '<p class="muted" style="margin:0">Esta marca ainda não tem modelos. Cria o primeiro.</p>' : ''}
+      ${f.newModel ? `<div class="notice" style="display:flex;flex-direction:column;gap:12px"><b>Novo modelo de ${esc(brand.name)}</b><div class="form-grid"><label class="f">Nome do modelo<input id="nf-nm" data-nf="nmName" value="${esc(f.nmName)}" placeholder="ex.: ThinkPad E14 Gen 5"></label><label class="f">Categoria<select id="nf-nmcat" data-nf="nmCat">${db.categories.filter(c => ['device', 'phone'].includes(c.kind)).map(c => `<option value="${c.id}" ${+f.nmCat === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select></label></div><div class="row"><button class="btn primary" data-act="nf-save-model">Criar modelo e usar</button><button class="btn" data-act="nf-cancel-model">Cancelar</button></div></div>` : ''}
+    </section>
+    <section class="card" style="display:flex;flex-direction:column;gap:14px;opacity:${mdl ? 1 : .55}"><div class="row"><span class="step" style="background:${stepColor(false, !!mdl)}">3</span><h2>S/N e detalhes</h2></div>
+      ${!mdl ? '<p class="muted" style="margin:0">Escolhe o modelo e a categoria é preenchida sozinha.</p>' : `
+      <div class="row"><span class="muted">Categoria:</span><b>${esc(cat(mdl.category).name)}</b><span class="chip">automático, vem do modelo</span></div>
+      <div class="tabs"><button class="${f.multi ? '' : 'on'}" data-act="nf-multi" data-v="0">Um S/N</button><button class="${f.multi ? 'on' : ''}" data-act="nf-multi" data-v="1">Vários S/N (leitor ou colar)</button></div>
+      ${f.multi ? `<label class="f">Nºs de série, um por linha<textarea id="nf-serials" data-nf="serials" rows="5" class="mono" placeholder="PF4X1A2E&#10;PF4X1A2F">${esc(f.serials)}</textarea></label><span class="small">Vão ser criados <b>${serials.length}</b> assets${serials.length ? `, de ${preview} a ${comp.code}-${String(comp.counter + serials.length).padStart(5, '0')}` : ''}.</span>`
+      : `<label class="f">${cat(mdl.category).kind === 'phone' ? 'IMEI' : 'N.º de série'}<input id="nf-serial" data-nf="serial" value="${esc(f.serial)}" class="mono" placeholder="Escreve ou lê com o leitor" style="height:46px;font-size:15px"></label>`}
+      ${dups.length ? `<div class="warnbox" role="alert">Já existe: ${dups.map(esc).join(', ')}. Abre esse asset em vez de criar outro.</div>` : ''}
+      <div class="form-grid"><label class="f">Asset tag<input value="${preview}${serials.length > 1 ? ' …' : ''}" readonly style="background:var(--surface2)"></label>
+        <label class="f">Estado<select id="nf-status" data-nf="status">${db.statuses.filter(s => s.type !== 'archived').map(s => `<option value="${s.id}" ${+f.status === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></label>
+        <label class="f">Localização<select id="nf-loc" data-nf="location"><option value="">—</option>${locs.map(l => `<option value="${l.id}" ${+f.location === l.id ? 'selected' : ''}>${esc(l.name)}</option>`).join('')}</select></label></div>
+      ${last ? `<label class="row notice" style="cursor:pointer;flex-wrap:nowrap;align-items:flex-start"><input type="checkbox" data-nf="copy" ${f.copy ? 'checked' : ''} style="width:18px;height:18px;margin-top:2px"><span><b>Copiar dados de compra do último ${esc(mdl.name)}</b><br><span class="small muted">${esc(last.tag)} · ${fmt(last.purchaseDate)} · ${money(last.cost)} · garantia ${esc(last.warranty || '—')} meses</span></span></label>` : ''}
+      <div class="row"><button class="btn primary" data-act="nf-save" data-next="1" ${serials.length && !dups.length ? '' : 'disabled'}>${serials.length > 1 ? `Guardar ${serials.length} e criar outros` : 'Guardar e criar outro'}</button><button class="btn" data-act="nf-save" data-next="0" ${serials.length && !dups.length ? '' : 'disabled'}>Guardar e fechar</button></div>`}
+    </section>
+  </div>
+  <aside class="card" style="flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:12px"><h2>Resumo</h2><dl class="kv">
+    <dt>Empresa</dt><dd>${esc(comp.name)}</dd><dt>Tag</dt><dd class="mono">${preview}</dd><dt>Marca</dt><dd>${esc(brand?.name || '—')}</dd><dt>Modelo</dt><dd>${esc(mdl?.name || '—')}</dd><dt>Categoria</dt><dd>${esc(mdl ? cat(mdl.category).name : '—')}</dd><dt>S/N</dt><dd class="mono">${esc(f.multi ? (serials.length ? serials.length + ' S/N' : '—') : (f.serial || '—'))}</dd></dl>
+    <p class="small muted" style="margin:0">Experimenta escrever um S/N que já existe, por exemplo <span class="mono">PF4X1A2B</span>.</p></aside>
+  </div>`;
+}
+
+function modalHTML() {
+  const m = st.modal; if (!m) return '';
+  const a = m.id && asset(m.id);
+  const wrap = (title, body, form, submit = 'Confirmar') => `<div class="modal-bg" data-act="modal-bg"><form class="modal" data-form="${form}" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="row between"><h2>${esc(title)}</h2><button type="button" class="btn sm" data-act="close-modal" aria-label="Fechar">✕</button></div>${m.error ? `<div class="warnbox" role="alert">${esc(m.error)}</div>` : ''}${body}<div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-act="close-modal">Cancelar</button><button class="btn primary" type="submit">${esc(submit)}</button></div></form></div>`;
+  if (m.type === 'checkout') {
+    const tt = m.tt || (['printer', 'server', 'nas'].includes(kindOf(a)) ? 'location' : kindOf(a) === 'line' ? 'asset' : 'user');
+    const opts = tt === 'user' ? db.users.filter(u => u.active && (u.company == null || myCompanies().includes(u.company))).map(u => [u.id, `${uname(u)}${u.company ? ' · ' + company(u.company).code : ''}`])
+      : tt === 'location' ? db.locations.filter(l => l.company == null || myCompanies().includes(l.company)).map(l => [l.id, l.name])
+      : db.assets.filter(x => x.id !== a.id && !x.deleted && myCompanies().includes(x.company) && (kindOf(a) !== 'line' || kindOf(x) === 'phone')).map(x => [x.id, `${x.tag} · ${x.name || modelLabel(x.model)}`]);
+    return wrap(`Check-out de ${a.tag}`, `<div class="tabs">${[['user', 'Pessoa'], ['location', 'Localização'], ['asset', kindOf(a) === 'line' ? 'Telemóvel' : 'Outro asset']].map(([id, l]) => `<button type="button" class="${tt === id ? 'on' : ''}" data-act="co-type" data-v="${id}">${l}</button>`).join('')}</div><input type="hidden" name="tt" value="${tt}">
+      <label class="f">Destino<select name="target" required><option value="">Escolhe…</option>${opts.map(([id, l]) => `<option value="${id}">${esc(l)}</option>`).join('')}</select></label>
+      <div class="form-grid"><label class="f">Devolução prevista<input type="date" name="expected"></label></div><label class="f">Nota<input name="note" placeholder="opcional; obrigatória para outra empresa"></label>`, 'checkout', 'Fazer check-out');
+  }
+  if (m.type === 'checkin') return wrap(`Check-in de ${a.tag}`, `<p style="margin:0" class="muted">Está com: <b>${esc(targetName(a.assigned))}</b></p><div class="form-grid"><label class="f">Volta no estado<select name="status">${db.statuses.filter(s => s.type !== 'archived').map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('')}</select></label><label class="f">Localização<select name="location"><option value="">Manter</option>${db.locations.filter(l => l.company == null || l.company === a.company).map(l => `<option value="${l.id}">${esc(l.name)}</option>`).join('')}</select></label></div><label class="f">Nota<input name="note"></label>`, 'checkin', 'Fazer check-in');
+  if (m.type === 'edit-asset') {
+    const md = model(a.model), mk = db.manufacturers.find(x => x.id === md?.manufacturer), k = kindOf(a), miss = missing(a);
+    const cats = db.categories.filter(c => ['device', 'phone'].includes(k) ? ['device', 'phone'].includes(c.kind) : c.kind === k);
+    const hl = f => miss.includes(f) ? ' style="--b:#D97706;border-color:#D97706"' : '';
+    return wrap(`Editar ${a.tag}`, `<datalist id="dl-brands">${db.manufacturers.filter(x => norm(x.name) !== 'semmarca').map(x => `<option value="${esc(x.name)}">`).join('')}</datalist><datalist id="dl-models">${db.models.filter(x => !mk || x.manufacturer === mk.id).map(x => `<option value="${esc(x.name)}">`).join('')}</datalist>
+      <div class="form-grid"><label class="f">Marca<input name="brand" list="dl-brands" required value="${esc(mk && norm(mk.name) !== 'semmarca' ? mk.name : '')}" placeholder="ex.: HP"${hl('marca')}></label><label class="f">Modelo<input name="model" list="dl-models" required value="${esc(miss.includes('modelo') ? '' : md?.name || '')}" placeholder="${esc(md?.name || '')}"${hl('modelo')}></label></div>
+      <div class="form-grid"><label class="f">Categoria<select name="category">${cats.map(c => `<option value="${c.id}" ${c.id === md?.category ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select></label><label class="f">${k === 'phone' ? 'IMEI' : 'N.º de série'}<input name="serial" class="mono" value="${esc(a.serial || '')}"${hl(k === 'phone' ? 'IMEI' : 'n.º de série')}></label></div>
+      <label class="f">Nome<input name="name" value="${esc(a.name || '')}" placeholder="opcional"></label><label class="f">Notas<input name="notes" value="${esc(a.notes || '')}"></label>`, 'edit-asset', 'Guardar');
+  }
+  if (m.type === 'status') return wrap(`Estado de ${a.tag}`, `<label class="f">Estado<select name="status">${db.statuses.map(s => `<option value="${s.id}" ${s.id === a.status ? 'selected' : ''}>${esc(s.name)} (${s.type})</option>`).join('')}</select></label><label class="f">Nota<input name="note"></label>`, 'status', 'Guardar');
+  if (m.type === 'transfer') return wrap(`Mudar ${a.tag} de empresa`, `${isAssigned(a) ? '<div class="warnbox">Faz check-in antes de mudar de empresa.</div>' : ''}<label class="f">Nova empresa<select name="company">${db.companies.filter(c => c.id !== a.company && myCompanies().includes(c.id)).map(c => `<option value="${c.id}">${esc(c.name)} (${c.code})</option>`).join('')}</select></label><label class="row" style="gap:8px"><input type="checkbox" name="retag" checked style="width:18px;height:18px"> Dar uma tag nova com o prefixo da empresa de destino</label><label class="f">Nota<input name="note"></label>`, 'transfer', 'Mudar de empresa');
+  if (m.type === 'delete') return wrap(`Apagar ${a.tag}?`, `<p style="margin:0">O asset deixa de aparecer nas listas, mas o histórico mantém-se.</p>${isAssigned(a) ? '<div class="warnbox">Faz check-in antes de apagar.</div>' : ''}`, 'delete', 'Apagar');
+  if (m.type === 'new-kind') {
+    const k = m.kind, cats = k === 'server' ? db.categories.filter(c => ['server', 'nas'].includes(c.kind)) : db.categories.filter(c => c.kind === k);
+    const mdls = db.models.filter(x => cats.some(c => c.id === x.category));
+    const defs = FIELD_DEFS[k === 'server' ? 'server' : k];
+    const title = { printer: 'Registar impressora', server: 'Registar servidor ou NAS', line: 'Nova linha móvel' }[k];
+    return wrap(title, `<div class="form-grid"><label class="f">Empresa<select name="company">${db.companies.filter(c => myCompanies().includes(c.id) && c.active !== false).map(c => `<option value="${c.id}" ${db.ui.company === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select></label>
+      <label class="f">Modelo<select name="model" required>${mdls.map(x => `<option value="${x.id}">${esc(modelLabel(x.id))} · ${esc(cat(x.category).name)}</option>`).join('')}</select></label>
+      ${k !== 'line' ? `<label class="f">N.º de série<input name="serial" class="mono"></label>` : ''}
+      ${defs.map(([key, label, opts]) => opts ? `<label class="f">${label}<select name="c_${key}">${opts.map(o => `<option>${o}</option>`).join('')}</select></label>` : `<label class="f">${label}<input name="c_${key}" ${key === 'ativacao' ? 'type="date"' : ''} class="${['ip', 'hostname', 'numero', 'pin', 'puk'].includes(key) ? 'mono' : ''}" ${key === 'numero' ? 'required inputmode="numeric" placeholder="9 dígitos"' : ''}></label>`).join('')}
+      ${k !== 'line' ? `<label class="f">Localização<select name="location"><option value="">—</option>${db.locations.filter(l => l.company == null || myCompanies().includes(l.company)).map(l => `<option value="${l.id}">${esc(l.name)}</option>`).join('')}</select></label>` : ''}</div>
+      ${k === 'line' ? '<p class="small muted" style="margin:0">Depois de criada, faz check-out da linha para o telemóvel: a linha passa a acompanhá-lo.</p>' : ''}`, 'new-kind', 'Registar');
+  }
+  if (m.type === 'acc-out') { const x = db.accessories.find(y => y.id === m.id); return wrap(`Entregar ${x.name}`, `<p class="muted" style="margin:0">${accAvail(x)} disponíveis</p><div class="form-grid"><label class="f">Pessoa<select name="user" required><option value="">Escolhe…</option>${db.users.filter(u => u.active && (u.company == null || myCompanies().includes(u.company))).map(u => `<option value="${u.id}">${esc(uname(u))}</option>`).join('')}</select></label><label class="f">Quantidade<input type="number" name="qty" min="1" max="${accAvail(x)}" value="1"></label></div><label class="f">Nota<input name="note"></label>`, 'acc-out', 'Entregar'); }
+  if (m.type === 'acc-list') { const x = db.accessories.find(y => y.id === m.id); const open = accOpen(x); return `<div class="modal-bg" data-act="modal-bg"><div class="modal" role="dialog" aria-modal="true" aria-label="Entregues"><div class="row between"><h2>${esc(x.name)}: entregues</h2><button class="btn sm" data-act="close-modal" aria-label="Fechar">✕</button></div>${open.length ? `<table><tbody>${open.map(c => `<tr><td>${esc(uname(user(c.user)))}</td><td class="muted small">${fmtDT(c.at)}</td><td style="text-align:right">${canWrite() ? `<button class="btn sm" data-act="acc-in" data-id="${c.id}">Receber</button>` : ''}</td></tr>`).join('')}</tbody></table>` : '<div class="muted">Nenhuma unidade entregue.</div>'}</div></div>`; }
+  if (m.type === 'new-acc') return wrap('Novo acessório', `<div class="form-grid"><label class="f">Nome<input name="name" required></label><label class="f">Categoria<input name="category" value="Periféricos"></label><label class="f">Empresa<select name="company">${db.companies.filter(c => myCompanies().includes(c.id) && c.active !== false).map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></label><label class="f">Quantidade<input type="number" name="qty" min="0" value="5"></label><label class="f">Stock mínimo<input type="number" name="min" min="0" value="2"></label></div>`, 'new-acc', 'Criar');
+  if (m.type === 'login-form') {
+    const u = m.id ? user(m.id) : null, role = m.role || u?.role || 'admin';
+    return wrap(u ? (u.login ? `Acesso de ${uname(u)}` : `Dar login a ${uname(u)}`) : 'Novo login', `<div class="form-grid">
+      <label class="f">Nome<input name="first" value="${esc(u?.first || '')}" required></label><label class="f">Apelido<input name="last" value="${esc(u?.last || '')}"></label>
+      <label class="f">E-mail (login)<input name="email" type="email" value="${esc(u?.email || '')}" required autocomplete="off"></label>
+      <label class="f">${u?.login ? 'Nova password (opcional)' : 'Password (opcional)'}<input name="password" type="password" minlength="8" autocomplete="new-password" placeholder="${u?.login ? 'mínimo 8 caracteres' : 'em branco: recebe convite por e-mail'}"></label>
+      <label class="f">Acesso<select name="role">${['admin', 'leitura'].map(r => `<option value="${r}" ${role === r ? 'selected' : ''}>${ROLE_LABEL[r]}</option>`).join('')}</select></label>
+      ${!u ? `<label class="f">Empresa principal<select name="company">${db.companies.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></label>` : ''}</div>
+      ${u?.login ? `<div class="row between"><label class="row" style="gap:8px"><input type="checkbox" name="loginActive" ${u.login ? 'checked' : ''} style="width:18px;height:18px"> Login ativo</label><button type="button" class="btn sm" data-act="send-reset" data-id="${u.id}">Enviar link de nova password</button></div>` : ''}
+      <p class="small muted" style="margin:0">Pode mexer: cria, edita, atribui e gere logins. Só consulta: vê tudo, não altera nada. Quem tem login vê todas as empresas.</p>`, 'login-form', u ? 'Guardar' : 'Criar login');
+  }
+  if (m.type === 'company-form') {
+    const c = m.id ? company(m.id) : null;
+    return wrap(c ? `Editar ${c.name}` : 'Nova empresa', `<div class="form-grid">
+      <label class="f">Nome<input name="name" value="${esc(c?.name || '')}" required maxlength="191"></label>
+      <label class="f">Código (prefixo das tags)<input name="code" value="${esc(c?.code || '')}" required pattern="[A-Za-z0-9]{2,5}" maxlength="5" class="mono" style="text-transform:uppercase" placeholder="ex.: OMT"></label>
+      <label class="f">NIF<input name="nif" value="${esc(c?.nif || '')}" inputmode="numeric" maxlength="20"></label></div>
+      ${c ? `<label class="row" style="gap:8px"><input type="checkbox" name="active" ${c.active === false ? '' : 'checked'} style="width:18px;height:18px"> Empresa ativa</label>
+      <p class="small muted" style="margin:0">Mudar o código só afeta as tags novas; as existentes mantêm-se.</p>
+      <div class="row" style="justify-content:flex-start"><button type="button" class="btn sm danger" data-act="delete-company" data-id="${c.id}">Apagar empresa</button><span class="small muted">Só é possível se estiver vazia.</span></div>` : '<p class="small muted" style="margin:0">Todos os logins passam a ver esta empresa logo.</p>'}
+      ${!c ? `<label class="f">Primeira localização (opcional)<input name="location" placeholder="ex.: Sede, Armazém"></label>` : ''}`, 'company-form', c ? 'Guardar' : 'Criar empresa');
+  }
+  if (m.type === 'new-user') return wrap('Novo utilizador', `<div class="form-grid"><label class="f">Nome<input name="first" required></label><label class="f">Apelido<input name="last"></label><label class="f">E-mail<input name="email" type="email"></label><label class="f">Empresa<select name="company">${db.companies.filter(c => myCompanies().includes(c.id) && c.active !== false).map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></label></div><p class="small muted" style="margin:0">Criado sem login: só recebe equipamentos.${isAdmin() ? '' : ' Só quem pode mexer dá login.'}</p>`, 'new-user', 'Criar');
+  return '';
+}
+
+function pageForgot() {
+  const f = st.forgot, u = f.sent && db.users.find(x => x.login && x.active && norm(x.email) === norm(f.email));
+  const wrapCard = body => `<div style="min-height:100vh;display:grid;place-items:center;padding:20px"><div class="card" style="width:min(400px,100%);display:flex;flex-direction:column;gap:14px;padding:26px"><div class="brand" style="color:var(--text);padding:0"><span class="logo" style="color:#fff">${ico('assets', 18)}</span>Inventário IT</div>${body}</div></div>`;
+  if (f.token) {
+    const tu = user(f.token.user), expired = Date.now() > f.token.exp;
+    return wrapCard(expired || f.token.used ? `<h1 style="font-size:20px">Link expirado</h1><div class="warnbox">Este link já foi usado ou passou dos 60 minutos. Pede um novo.</div><button class="btn primary" data-act="forgot-open" style="justify-content:center">Pedir novo link</button>`
+      : `<form data-form="reset-password" style="display:flex;flex-direction:column;gap:14px"><h1 style="font-size:20px">Nova password</h1>${f.error ? `<div class="warnbox" role="alert">${esc(f.error)}</div>` : ''}<p class="small muted" style="margin:0">Para <b>${esc(tu.email)}</b>.</p>
+        <label class="f">Nova password<input id="rp-1" name="password" type="password" minlength="8" autocomplete="new-password" required autofocus></label><label class="f">Confirmar password<input name="confirm" type="password" minlength="8" autocomplete="new-password" required></label>
+        <button class="btn primary" type="submit" style="justify-content:center">Guardar password</button></form>`);
+  }
+  return wrapCard(`<form data-form="forgot" style="display:flex;flex-direction:column;gap:14px"><h1 style="font-size:20px">Esqueci-me da password</h1>
+    <p class="small muted" style="margin:0">Escreve o e-mail com que entras. Enviamos um link para definires uma nova password.</p>
+    ${f.sent ? `<div class="notice small" role="status">Se o e-mail tiver login ativo, vais receber um link para definir uma nova password. Vê também o spam.</div>` : ''}
+    <label class="f">E-mail<input id="fg-email" name="email" type="email" value="${esc(f.email || '')}" autocomplete="email" required autofocus></label>
+    <button class="btn primary" type="submit" style="justify-content:center">Enviar link</button>
+    <button type="button" class="btn" data-act="forgot-close" style="justify-content:center">← Voltar ao login</button></form>
+    ${f.sent ? `<div class="card" style="padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--surface2)"><div class="small muted">📬 Caixa de correio simulada (a demonstração não envia e-mails)</div>${u ? `<div><b>Nova password · Inventário IT</b><div class="small muted">Para ${esc(u.email)} · válido 60 minutos</div></div><button class="btn sm" data-act="forgot-link" data-id="${u.id}">Definir nova password</button>` : '<div class="small">Nenhum e-mail enviado: esse endereço não tem login ativo. A página mostra a mesma mensagem para não revelar quem tem conta.</div>'}</div>` : ''}`);
+}
+function pageLogin() {
+  if (st.forgot) return pageForgot();
+  const e = st.loginError;
+  return `<div style="min-height:100vh;display:grid;place-items:center;padding:20px">
+  <form data-form="login" class="card" style="width:min(400px,100%);display:flex;flex-direction:column;gap:14px;padding:26px">
+    <div class="brand" style="color:var(--text);padding:0"><span class="logo" style="color:#fff">${ico('assets', 18)}</span>Inventário IT</div>
+    <h1 style="font-size:20px">${db.ui.sessions.length ? 'Entrar com outro login' : 'Entrar'}</h1>
+    ${e ? `<div class="warnbox" role="alert">${esc(e)}</div>` : ''}
+    <label class="f">E-mail<input id="lg-email" name="email" type="email" autocomplete="username" value="${esc(st.loginEmail || '')}" required autofocus></label>
+    <label class="f">Password<input name="password" type="password" autocomplete="current-password" required></label>
+    <button class="btn primary" type="submit" style="justify-content:center">Entrar</button>
+    <a data-act="forgot-open" style="text-align:center;cursor:pointer">Esqueci-me da password</a>
+    ${db.ui.sessions.length ? '<button type="button" class="btn" data-act="cancel-login" style="justify-content:center">Voltar à sessão aberta</button>' : ''}
+    <div class="notice small">Demonstração. Logins de exemplo: <span class="mono">admin@example.com / admin123</span>, <span class="mono">carlos@example.com / carlos123</span>, <span class="mono">tecnico@example.com / tecnico123</span> (pode mexer), <span class="mono">leitura@example.com / leitura123</span> (só consulta).<br>Várias pessoas podem estar ligadas ao mesmo tempo: usa “+ Sessão” para abrir outra.</div>
+  </form></div>`;
+}
+
+function render() {
+  document.documentElement.dataset.theme = db.ui.theme;
+  const f = document.activeElement, fid = f && f.id, sel = f && typeof f.selectionStart === 'number' ? [f.selectionStart, f.selectionEnd] : null;
+  if (st.login || !me()) {
+    $('#app').innerHTML = pageLogin() + (st.toast ? `<div class="toast ${st.toast.err ? 'err' : ''}" role="status">${esc(st.toast.msg)}</div>` : '');
+    if (fid) document.getElementById(fid)?.focus();
+    save(); return;
+  }
+  let inner;
+  if (st.detail && asset(st.detail)) inner = pageAssetDetail(asset(st.detail));
+  else inner = ({ painel: pagePainel, assets: pageAssets, impressoras: pageImpressoras, servidores: pageServidores, linhas: pageLinhas, acessorios: pageAcessorios, utilizadores: pageUtilizadores, historico: pageHistorico, tokens: pageTokens, empresas: pageEmpresas, importar: pageImportar, novo: pageNovo }[st.page] || pagePainel)();
+  $('#app').innerHTML = shell(inner) + modalHTML() + (st.toast ? `<div class="toast ${st.toast.err ? 'err' : ''}" role="status">${esc(st.toast.msg)}</div>` : '');
+  if (fid) { const el = document.getElementById(fid); if (el) { el.focus(); if (sel && el.setSelectionRange) try { el.setSelectionRange(...sel); } catch {} } }
+  save();
+}
+
+function route() {
+  const h = location.hash.slice(1);
+  st.page = h === 'novo-asset' ? 'novo' : h === 'tokens' ? 'tokens' : (NAV.some(n => n[0] === h) ? h : 'painel');
+  if (st.page !== 'tokens') st.newToken = null;
+  st.detail = null; st.modal = null; st.menu = null;
+  if (st.page !== 'utilizadores') st.userDetail = null;
+  if (st.page === 'novo') st.nf = null;
+  render(); window.scrollTo(0, 0);
+}
+
+function checkout(a, tt, targetId, expected, note) {
+  if (isAssigned(a)) return 'Este asset já está atribuído. Faz check-in primeiro.';
+  if (status(a.status).type !== 'deployable') return `O estado "${status(a.status).name}" não permite check-out. Muda o estado para Pronto.`;
+  if (!targetId) return 'Escolhe o destino.';
+  if (tt === 'user') {
+    const u = user(targetId);
+    if (!u.active) return 'Este utilizador está inativo.';
+    if (u.company && u.company !== a.company) { if (!isAdmin()) return 'O utilizador é de outra empresa.'; if (!note) return 'Check-out para outra empresa: tens de deixar uma nota.'; }
+    a.location = u.location || a.location;
+  }
+  if (tt === 'asset') { let c = asset(targetId); for (let i = 0; c && i < 10; i++) { if (c.id === a.id) return 'Não se pode atribuir um asset a si próprio.'; c = c.assigned?.type === 'asset' ? asset(c.assigned.id) : null; } a.location = asset(targetId).location || a.location; }
+  if (tt === 'location') a.location = targetId;
+  a.assigned = { type: tt, id: targetId }; a.expected = expected || ''; a.lastCheckout = new Date().toISOString();
+  log('checkout', 'asset', a.id, a.assigned, note);
+  return null;
+}
+function checkin(a, statusId, locationId, note) {
+  const from = a.assigned; a.assigned = null; a.expected = ''; if (statusId) a.status = statusId; if (locationId) a.location = locationId;
+  log('checkin from', 'asset', a.id, from, note);
+}
+
+const actions = {
+  menu(d) { st.menu = st.menu === d.id ? null : d.id; render(); },
+  'close-menu'() { st.menu = null; },
+  'pick-company'(d) { db.ui.company = d.id === 'all' ? 'all' : +d.id; st.menu = null; st.detail = null; render(); },
+  'switch-session'(d) { db.ui.role = +d.id; st.menu = null; if (db.ui.company !== 'all' && !myCompanies().includes(db.ui.company)) db.ui.company = 'all'; st.revealed = {}; st.detail = null; if (!canWrite() && st.page === 'novo') location.hash = 'painel'; render(); toast(`Sessão ativa: ${uname(me())} (${ROLE_LABEL[me().role]}).`); },
+  logout() { st.menu = null; const id = db.ui.role; db.ui.sessions = db.ui.sessions.filter(x => x !== id); db.ui.role = db.ui.sessions[0] || null; st.detail = null; st.modal = null; st.revealed = {}; if (!db.ui.role) st.login = true; render(); toast(db.ui.role ? `Sessão terminada. Voltaste à sessão de ${uname(me())}.` : 'Sessão terminada.'); },
+  'add-session'() { st.menu = null; st.login = true; st.loginError = null; render(); },
+  'cancel-login'() { st.login = false; render(); },
+  'revoke-token'(d) { const t = db.tokens.find(x => x.id === +d.id); db.tokens = db.tokens.filter(x => x !== t); log('delete', 'user', me().id, null, `Token da API "${t.name}" revogado`); st.newToken = null; render(); toast('Token revogado.'); },
+  'forgot-open'() { st.forgot = { email: st.loginEmail || '' }; render(); },
+  'forgot-close'() { st.forgot = null; render(); },
+  'forgot-link'(d) { st.forgot.token = { user: +d.id, exp: Date.now() + 3600e3 }; st.forgot.error = null; render(); },
+  'send-reset'(d) { const u = user(+d.id); log('update', 'user', u.id, null, 'Enviado link de nova password'); toast(`Link de nova password enviado para ${u.email}. Na demonstração, usa "Esqueci-me da password" no login para o ver.`); },
+  'new-login'() { st.modal = { type: 'login-form' }; render(); },
+  'edit-login'(d) { st.modal = { type: 'login-form', id: +d.id }; render(); },
+  'imp-tab'(d) { impState().tab = d.id; render(); },
+  'imp-module'(d) { const s = impState(); s.module = d.id; render(); },
+  'imp-sample'() { const s = impState(); s.text = SAMPLES[s.module]; s.fileName = 'exemplo'; render(); },
+  'imp-template'() { const s = impState(), txt = IO[s.module].fields.map(f => f[1]).join(s.module === 'snipeit' ? ',' : ';'); navigator.clipboard?.writeText(txt).then(() => toast('Cabeçalho copiado. Cola-o na primeira linha do Excel.'), () => toast('Não foi possível copiar: ' + txt, true)); },
+  'imp-next'() { const s = impState(); s.parsed = parseDelimited(s.text);
+    const best = detectModule(s.parsed.headers); if (best && best !== s.module) { s.module = best; toast(best === 'snipeit' ? 'Ficheiro do Snipe-IT detetado: cada linha vai para a secção certa pela categoria.' : `Pelas colunas, isto parece ${IO[best].label}: mudei para aí.`); } if (!s.parsed.rows.length) return toast('Não encontrei linhas de dados por baixo do cabeçalho.', true); s.map = autoMap(s.module, s.parsed.headers); s.step = 'map'; render(); },
+  'imp-back'(d) { impState().step = d.to; render(); },
+  'imp-preview'() { const s = impState(); if (!s.map.some(Boolean)) return toast('Escolhe para onde vai pelo menos uma coluna.', true); s.step = 'preview'; render(); },
+  'imp-run'() {
+    const s = impState(), plan = runPlan(s);
+    const b = { id: nextId(), at: new Date().toISOString(), by: me().id, module: s.module, ok: 0, errors: 0, created: { assets: [], users: [], models: [], manufacturers: [], locations: [], accessories: [] }, updated: [], updatedAcc: [], updatedUsers: [] };
+    plan.forEach(p => { if (p.status === 'error') { b.errors++; return; } p.apply(b); b.ok++; });
+    db.imports.push(b); s.result = b; s.step = 'done'; s.text = ''; s.fileName = ''; render(); toast(`Importação concluída: ${plural(b.ok, 'linha', 'linhas')}.`);
+  },
+  'imp-undo'(d) { undoImport(+d.id); const s = impState(); if (s.step === 'done') { s.step = 'input'; } render(); toast('Importação anulada: tudo voltou ao estado anterior.'); },
+  'imp-new'() { Object.assign(impState(), { step: 'input', text: '', fileName: '', result: null }); render(); },
+  'ex-module'(d) { impState().exModule = d.id; render(); },
+  'ex-copy'(d) { const s = impState(), rows = exportRows(s.exModule); const txt = d.tsv ? rows.map(r => r.map(v => String(v ?? '').replace(/[\t\n]/g, ' ')).join('\t')).join('\n') : toCSV(rows).slice(1); if (s.exModule === 'lines' && s.exSecrets && isAdmin()) log('view encrypted', 'export', 0, null, 'Exportou linhas com PIN/PUK'); navigator.clipboard?.writeText(txt).then(() => toast(d.tsv ? `${plural(rows.length - 1, 'registo copiado', 'registos copiados')}. Abre o Excel e cola (Ctrl+V).` : 'CSV copiado.'), () => toast('O navegador não deixou copiar.', true)); },
+  'set-company'(d) { db.ui.company = d.id === 'all' ? 'all' : +d.id; render(); },
+  'new-company'() { st.modal = { type: 'company-form' }; render(); },
+  'edit-company'(d) { st.modal = { type: 'company-form', id: +d.id }; render(); },
+  'delete-company'(d) { const c = company(+d.id); if (companyUsage(c.id)) { st.modal.error = 'Só se pode apagar uma empresa sem equipamentos, linhas, acessórios nem pessoas. Desativa-a em vez disso.'; return render(); } db.companies = db.companies.filter(x => x.id !== c.id); db.users.forEach(u => { if (u.companies) u.companies = u.companies.filter(x => x !== c.id); }); db.locations = db.locations.filter(l => l.company !== c.id); if (db.ui.company === c.id) db.ui.company = 'all'; log('delete', 'company', c.id, null, c.name); st.modal = null; toast(`${c.name} apagada.`); },
+  theme() { db.ui.theme = db.ui.theme === 'dark' ? 'light' : 'dark'; render(); },
+  reset() { db = seed(); db.imports = []; st.imp = null; st.login = false; st.menu = null; st.revealed = {}; st.detail = null; st.userDetail = null; st.modal = null; toast('Dados de demonstração repostos.'); },
+  'open-asset'(d, e) { e.preventDefault(); st.detail = +d.id; st.modal = null; render(); window.scrollTo(0, 0); },
+  'close-detail'(d, e) { e.preventDefault(); st.detail = null; if (location.hash.slice(1) !== d.page) location.hash = d.page; else render(); },
+  'open-user'(d) { st.userDetail = +d.id; st.detail = null; render(); window.scrollTo(0, 0); },
+  'back-users'(d, e) { e.preventDefault(); st.userDetail = null; render(); },
+  'go-filter'(d) { st.filter[d.page] = d.f; location.hash = d.page; },
+  tab(d) { st.filter[d.page] = d.id; render(); },
+  reveal(d) { const id = +d.id; st.revealed[id] = !st.revealed[id]; if (st.revealed[id]) log('view encrypted', 'asset', id); render(); },
+  checkout(d) { st.modal = { type: 'checkout', id: +d.id }; render(); },
+  checkin(d) { st.modal = { type: 'checkin', id: +d.id }; render(); },
+  status(d) { st.modal = { type: 'status', id: +d.id }; render(); },
+  transfer(d) { st.modal = { type: 'transfer', id: +d.id }; render(); },
+  'edit-asset'(d) { st.modal = { type: 'edit-asset', id: +d.id }; render(); },
+  delete(d) { st.modal = { type: 'delete', id: +d.id }; render(); },
+  'co-type'(d) { st.modal.tt = d.v; st.modal.error = null; render(); },
+  'close-modal'() { st.modal = null; render(); },
+  'modal-bg'(d, e) { if (e.target.classList.contains('modal-bg')) { st.modal = null; render(); } },
+  'new-kind'(d) { st.modal = { type: 'new-kind', kind: d.kind }; render(); },
+  'new-acc'() { st.modal = { type: 'new-acc' }; render(); },
+  'new-user'() { st.modal = { type: 'new-user' }; render(); },
+  'acc-out'(d) { st.modal = { type: 'acc-out', id: +d.id }; render(); },
+  'acc-list'(d) { st.modal = { type: 'acc-list', id: +d.id }; render(); },
+  'acc-in'(d) { const c = db.accCheckouts.find(x => x.id === +d.id); c.inAt = new Date().toISOString(); log('checkin from', 'accessory', c.acc, { type: 'user', id: c.user }); toast('Acessório recebido.'); },
+  'return-all'(d) { const u = user(+d.id), it = userItems(u); it.assets.forEach(a => checkin(a, null, null, 'Devolução de tudo')); it.acc.forEach(c => { c.inAt = new Date().toISOString(); log('checkin from', 'accessory', c.acc, { type: 'user', id: u.id }, 'Devolução de tudo'); }); toast(`Devolvido${it.assets.length + it.acc.length === 1 ? '' : 's'}: ${it.assets.length} asset${it.assets.length === 1 ? '' : 's'} e ${it.acc.length} acessório${it.acc.length === 1 ? '' : 's'}.`); },
+  'toggle-active'(d) { const u = user(+d.id); if (u.active && (userItems(u).assets.length || userItems(u).acc.length)) return toast('Este utilizador ainda tem equipamentos. Usa "Devolver tudo" primeiro.', true); u.active = !u.active; log('update', 'user', u.id, null, u.active ? 'Ativado' : 'Desativado'); toast(u.active ? 'Utilizador ativado.' : 'Utilizador desativado.'); },
+  'nf-brand'(d) { Object.assign(newForm(), { brand: +d.id, model: null, newModel: false, msg: '' }); render(); },
+  'nf-new-brand'() { const f = newForm(), name = f.q.trim(); const b = { id: nextId(), name }; db.manufacturers.push(b); Object.assign(f, { brand: b.id, model: null, newModel: true, nmName: '', msg: '' }); log('create', 'manufacturer', b.id); render(); },
+  'nf-clear-brand'() { Object.assign(newForm(), { brand: null, model: null, newModel: false }); render(); },
+  'nf-model'(d) { Object.assign(newForm(), { model: +d.id, newModel: false, msg: '' }); render(); $('#nf-serial, #nf-serials')?.focus(); },
+  'nf-open-model'() { Object.assign(newForm(), { newModel: true, nmName: '' }); render(); },
+  'nf-cancel-model'() { newForm().newModel = false; render(); },
+  'nf-save-model'() { const f = newForm(); if (!f.nmName.trim()) return toast('Escreve o nome do modelo.', true); if (db.models.some(m => m.manufacturer === f.brand && m.name.toLowerCase() === f.nmName.trim().toLowerCase())) return toast('Esse modelo já existe nesta marca.', true); const m = { id: nextId(), manufacturer: f.brand, name: f.nmName.trim(), category: +f.nmCat }; db.models.push(m); Object.assign(f, { model: m.id, newModel: false }); render(); },
+  'nf-multi'(d) { newForm().multi = d.v === '1'; render(); },
+  'nf-save'(d) {
+    const f = newForm(), mdl = model(f.model);
+    const list = f.multi ? f.serials.split('\n').map(s => s.trim()).filter(Boolean) : [f.serial.trim()].filter(Boolean);
+    const last = [...db.assets].reverse().find(a => a.model === mdl.id && a.purchaseDate);
+    const created = list.map(serial => { const a = { id: nextId(), company: +f.company, model: mdl.id, status: +f.status, tag: nextTag(+f.company), name: '', serial, purchaseDate: '', cost: '', warranty: '', location: f.location ? +f.location : null, assigned: null, expected: '', notes: '', custom: {}, created: new Date().toISOString() }; if (f.copy && last) Object.assign(a, { purchaseDate: last.purchaseDate, cost: last.cost, warranty: last.warranty }); db.assets.push(a); log('create', 'asset', a.id); return a; });
+    const msg = created.length === 1 ? `Criado ${created[0].tag} · ${modelLabel(mdl.id)} · S/N ${created[0].serial}` : `Criados ${created.length} assets (${created[0].tag} a ${created.at(-1).tag}) · ${modelLabel(mdl.id)}`;
+    if (d.next === '1') { Object.assign(f, { serial: '', serials: '', msg: msg + '. Marca e modelo mantêm-se para o próximo.' }); render(); $('#nf-serial, #nf-serials')?.focus(); }
+    else { st.nf = null; location.hash = 'assets'; toast(msg); }
+  }
+};
+
+function companyUsage(id) { return db.assets.some(a => !a.deleted && a.company === id) || db.accessories.some(x => x.company === id) || db.users.some(u => u.company === id); }
+const forms = {
+  'company-form'(fd) {
+    const m = st.modal, c = m.id ? company(m.id) : null, name = fd.get('name').trim(), code = fd.get('code').trim().toUpperCase(), nif = fd.get('nif').trim();
+    if (!/^[A-Z0-9]{2,5}$/.test(code)) { st.modal.error = 'O código tem de ter 2 a 5 letras ou números.'; return render(); }
+    if (db.companies.some(x => x.id !== c?.id && x.code === code)) { st.modal.error = `O código ${code} já está a ser usado.`; return render(); }
+    if (db.companies.some(x => x.id !== c?.id && x.name.toLowerCase() === name.toLowerCase())) { st.modal.error = 'Já existe uma empresa com esse nome.'; return render(); }
+    if (c) { const before = `${c.name} (${c.code})`; Object.assign(c, { name, code, nif, active: !!fd.get('active') }); log('update', 'company', c.id, null, `${before} → ${name} (${code})${c.active ? '' : ' · desativada'}`); st.modal = null; return toast('Empresa atualizada.'); }
+    const n = { id: nextId(), name, code, nif, counter: 0, active: true };
+    db.companies.push(n);
+    const l = fd.get('location')?.trim(); if (l) db.locations.push({ id: nextId(), name: l, company: n.id });
+    log('create', 'company', n.id, null, `${name} (${code})`); st.modal = null; toast(`${name} criada. As tags vão ser ${code}-00001, ${code}-00002…`);
+  },
+  'new-token'(fd) {
+    const access = fd.get('access'), exp = fd.get('expires'), name = fd.get('name').trim();
+    const rnd = Array.from(crypto.getRandomValues(new Uint8Array(24)), b => b.toString(16).padStart(2, '0')).join('');
+    (db.tokens ||= []).push({ id: nextId(), user: me().id, name, access, created: Date.now(), expires: exp === 'never' ? null : Date.now() + +exp * 864e5 });
+    st.newToken = `${db.tokens.length}|${rnd}`;
+    log('create', 'user', me().id, null, `Token da API "${name}" (${access === 'write' ? 'leitura e escrita' : 'só leitura'}, ${TOKEN_EXPIRY[exp]})`); render();
+  },
+  forgot(fd) { st.forgot = { email: fd.get('email').trim(), sent: true }; render(); },
+  'reset-password'(fd) {
+    const f = st.forgot, u = user(f.token.user), pw = fd.get('password');
+    if (pw.length < 8) { f.error = 'A password tem de ter pelo menos 8 caracteres.'; return render(); }
+    if (pw !== fd.get('confirm')) { f.error = 'As duas passwords não são iguais.'; return render(); }
+    u.password = pw; f.token.used = true; db.logs.push({ id: nextId(), at: new Date().toISOString(), action: 'update', itemType: 'user', itemId: u.id, targetType: null, targetId: null, by: u.id, note: 'Password reposta pelo próprio (link por e-mail)' });
+    st.forgot = null; st.loginEmail = u.email; st.loginError = null; render(); toast('Password alterada. Já podes entrar.');
+  },
+  login(fd) {
+    const email = fd.get('email').trim().toLowerCase(), u = db.users.find(x => x.login && x.email?.toLowerCase() === email);
+    st.loginEmail = fd.get('email').trim();
+    if (!u || u.password !== fd.get('password')) { st.loginError = 'E-mail ou password errados.'; return render(); }
+    if (!u.active) { st.loginError = 'Este login está desativado.'; return render(); }
+    if (!db.ui.sessions.includes(u.id)) db.ui.sessions.push(u.id);
+    db.ui.role = u.id; st.login = false; st.loginError = null; st.loginEmail = ''; st.detail = null; st.revealed = {};
+    if (db.ui.company !== 'all' && !myCompanies().includes(db.ui.company)) db.ui.company = 'all';
+    location.hash = 'painel'; render(); toast(`Olá, ${u.first}. ${db.ui.sessions.length > 1 ? db.ui.sessions.length + ' sessões abertas ao mesmo tempo.' : ''}`);
+  },
+  'login-form'(fd) {
+    const m = st.modal, u = m.id ? user(m.id) : null, email = fd.get('email').trim(), role = fd.get('role'), pw = fd.get('password');
+    const comps = db.companies.map(c => c.id);
+    const active = u?.login ? !!fd.get('loginActive') : true;
+    const fail = msg => { st.modal.error = msg; st.modal.role = role; render(); };
+    if (db.users.some(x => x.id !== u?.id && x.email?.toLowerCase() === email.toLowerCase())) return fail('Esse e-mail já está a ser usado.');
+    if (pw && pw.length < 8) return fail('A password tem de ter pelo menos 8 caracteres.');
+    const admins = db.users.filter(x => x.login && x.active && x.role === 'admin');
+    if (u && u.role === 'admin' && (role !== 'admin' || !active) && admins.length === 1) return fail('Tem de existir pelo menos um login ativo que possa mexer.');
+    if (u && u.id === me().id && (role !== 'admin' || !active)) return fail('Não podes tirar a ti próprio o "Pode mexer" nem desativar o teu login.');
+    const data = { first: fd.get('first').trim(), last: fd.get('last').trim(), email, role, companies: comps, login: true, active };
+    if (pw) data.password = pw;
+    if (u) { const before = u.login ? ROLE_LABEL[u.role] : 'sem login'; Object.assign(u, data); if (!active) db.ui.sessions = db.ui.sessions.filter(x => x !== u.id); log('update', 'user', u.id, null, `Acesso: ${before} → ${active ? ROLE_LABEL[role] : 'desativado'}${pw ? ' · password alterada' : ''}`); }
+    else { const n = { id: nextId(), ...data, company: +fd.get('company') || null }; db.users.push(n); log('create', 'user', n.id, null, `Login ${ROLE_LABEL[role]}`); }
+    const invited = !pw && !(u && u.password);
+    st.modal = null; toast(invited ? `Login criado. ${data.first} recebeu um e-mail em ${email} para definir a password (na demonstração: "Esqueci-me da password" no login).` : u ? 'Acesso atualizado.' : `Login criado. Já pode entrar com ${email}.`);
+  },
+  checkout(fd) { const a = asset(st.modal.id); const err = checkout(a, fd.get('tt'), +fd.get('target'), fd.get('expected'), fd.get('note').trim()); if (err) { st.modal.error = err; return render(); } st.modal = null; toast(`Check-out de ${a.tag} feito.`); },
+  checkin(fd) { const a = asset(st.modal.id); checkin(a, +fd.get('status'), +fd.get('location') || null, fd.get('note').trim()); st.modal = null; toast(`Check-in de ${a.tag} feito.`); },
+  'edit-asset'(fd) {
+    const a = asset(st.modal.id), brand = fd.get('brand').trim(), mname = fd.get('model').trim(), catId = +fd.get('category'), serial = fd.get('serial').trim();
+    if (serial && db.assets.some(x => x.id !== a.id && !x.deleted && x.serial && norm(x.serial) === norm(serial))) { st.modal.error = `O n.º de série ${serial} já existe noutro asset.`; return render(); }
+    let mk = findMaker(brand); if (!mk) { mk = { id: nextId(), name: brand }; db.manufacturers.push(mk); }
+    let md = findModel(mk.id, mname); if (!md) { md = { id: nextId(), manufacturer: mk.id, name: mname, category: catId }; db.models.push(md); } else if (md.category !== catId) md.category = catId;
+    const before = `${modelLabel(a.model)}${a.serial ? ' · ' + a.serial : ''}`;
+    Object.assign(a, { model: md.id, serial, name: fd.get('name').trim(), notes: fd.get('notes').trim() });
+    log('update', 'asset', a.id, null, `${before} → ${modelLabel(a.model)}${a.serial ? ' · ' + a.serial : ''}`); st.modal = null;
+    toast(missing(a).length ? `Guardado. Ainda falta: ${missing(a).join(', ')}.` : 'Guardado. Ficou completo.');
+  },
+  status(fd) { const a = asset(st.modal.id), old = status(a.status).name; a.status = +fd.get('status'); log('update', 'asset', a.id, null, `Estado: ${old} → ${status(a.status).name}${fd.get('note') ? ' · ' + fd.get('note') : ''}`); st.modal = null; toast('Estado atualizado.'); },
+  transfer(fd) { const a = asset(st.modal.id); if (isAssigned(a)) { st.modal.error = 'Faz check-in antes de mudar de empresa.'; return render(); } const from = company(a.company).code, to = +fd.get('company'); a.company = to; const oldTag = a.tag; if (fd.get('retag')) a.tag = nextTag(to); a.location = null; log('transfer', 'asset', a.id, null, `${fd.get('note') || ''}${a.tag !== oldTag ? ` (tag ${oldTag} → ${a.tag})` : ''}`.trim(), { from, to: company(to).code }); st.modal = null; if (!inScope(to)) st.detail = null; toast(`${a.tag} passou para ${company(to).name}.`); },
+  delete() { const a = asset(st.modal.id); if (isAssigned(a)) { st.modal.error = 'Faz check-in antes de apagar.'; return render(); } a.deleted = true; log('delete', 'asset', a.id); st.modal = null; st.detail = null; toast(`${a.tag} apagado.`); },
+  'new-kind'(fd) {
+    const k = st.modal.kind, c = +fd.get('company'), mdl = +fd.get('model'), custom = {};
+    for (const [key, val] of fd.entries()) if (key.startsWith('c_') && val.trim()) custom[key.slice(2)] = val.trim();
+    if (k === 'line') { if (!/^9[1236]\d{7}$/.test(custom.numero || '')) { st.modal.error = 'O número tem de ter 9 dígitos e começar por 91, 92, 93 ou 96.'; return render(); } if (db.assets.some(a => a.custom.numero === custom.numero && !a.deleted)) { st.modal.error = 'Esse número já existe.'; return render(); } if (custom.pin && !/^\d{4,8}$/.test(custom.pin)) { st.modal.error = 'O PIN tem de ter 4 a 8 dígitos.'; return render(); } if (custom.puk && !/^\d{8}$/.test(custom.puk)) { st.modal.error = 'O PUK tem de ter 8 dígitos.'; return render(); } }
+    if (custom.ip && !/^(\d{1,3}\.){3}\d{1,3}$/.test(custom.ip)) { st.modal.error = 'Endereço IP inválido.'; return render(); }
+    const serial = (fd.get('serial') || '').trim();
+    if (serial && db.assets.some(a => a.serial && a.serial.toLowerCase() === serial.toLowerCase())) { st.modal.error = 'Esse n.º de série já existe.'; return render(); }
+    const a = { id: nextId(), company: c, model: mdl, status: 1, tag: nextTag(c), name: k === 'line' ? custom.numero.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3') : (custom.hostname || ''), serial, purchaseDate: '', cost: '', warranty: '', location: fd.get('location') ? +fd.get('location') : null, assigned: null, expected: '', notes: '', custom, created: new Date().toISOString() };
+    db.assets.push(a); log('create', 'asset', a.id);
+    if (a.location && k !== 'line') checkout(a, 'location', a.location, '', 'Instalado');
+    st.modal = null; st.detail = a.id; toast(`${a.tag} registado.`);
+  },
+  'acc-out'(fd) { const x = db.accessories.find(y => y.id === st.modal.id), qty = Math.max(1, +fd.get('qty') || 1), u = user(+fd.get('user')); if (!u) { st.modal.error = 'Escolhe a pessoa.'; return render(); } if (qty > accAvail(x)) { st.modal.error = 'Não há unidades suficientes.'; return render(); } if (u.company && u.company !== x.company && !isAdmin()) { st.modal.error = 'O utilizador é de outra empresa.'; return render(); } for (let i = 0; i < qty; i++) db.accCheckouts.push({ id: nextId(), acc: x.id, user: u.id, at: new Date().toISOString(), inAt: null }); log('checkout', 'accessory', x.id, { type: 'user', id: u.id }, fd.get('note'), { qty }); st.modal = null; toast(`${qty} × ${x.name} entregue a ${uname(u)}.`); },
+  'new-acc'(fd) { const x = { id: nextId(), name: fd.get('name').trim(), category: fd.get('category').trim() || 'Outros', company: +fd.get('company'), qty: +fd.get('qty') || 0, min: +fd.get('min') || 0 }; db.accessories.push(x); log('create', 'accessory', x.id); st.modal = null; toast('Acessório criado.'); },
+  'new-user'(fd) { const email = fd.get('email').trim(); if (email && db.users.some(u => u.email === email)) { st.modal.error = 'Esse e-mail já existe.'; return render(); } const u = { id: nextId(), first: fd.get('first').trim(), last: fd.get('last').trim(), email, company: +fd.get('company'), active: true }; db.users.push(u); log('create', 'user', u.id); st.modal = null; toast(`${uname(u)} criado.`); }
+};
+
+document.addEventListener('click', e => {
+  if (st.menu && !e.target.closest('.menu-wrap')) { st.menu = null; if (!e.target.closest('[data-act]')) return render(); }
+  const el = e.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  const fn = actions[el.dataset.act];
+  if (fn) { if (el.tagName === 'BUTTON' && el.type !== 'submit') e.preventDefault(); fn(el.dataset, e); }
+});
+document.addEventListener('input', e => {
+  const el = e.target;
+  if (el.dataset.imp === 'text') { impState().text = el.value; return render(); }
+  if (el.dataset.input === 'q') { st.q[el.dataset.page] = el.value; render(); }
+  else if (el.dataset.nf && el.type !== 'checkbox' && el.tagName !== 'SELECT') { newForm()[el.dataset.nf] = el.value; render(); }
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.dataset.imp === 'company') { impState().company = +el.value; return render(); }
+  if (el.dataset.impMap != null) { impState().map[+el.dataset.impMap] = el.value; return render(); }
+  if (el.dataset.impCheck) { impState()[el.dataset.impCheck] = el.checked; return render(); }
+  if (el.hasAttribute('data-imp-file') && el.files[0]) {
+    const f = el.files[0];
+    if (/\.xlsx?$/i.test(f.name)) return toast('Na demonstração não se lê .xlsx: copia as células no Excel e cola na caixa. A aplicação real lê .xlsx diretamente.', true);
+    const rd = new FileReader(); rd.onload = () => { const s = impState(); s.text = String(rd.result); s.fileName = f.name; render(); }; rd.readAsText(f, 'utf-8'); return;
+  }
+  if (el.dataset.change === 'company') { db.ui.company = el.value === 'all' ? 'all' : +el.value; st.detail = null; render(); }
+  else if (el.dataset.actChange === 'login-role') { const f = el.form; f.querySelector('[data-role-admin]').hidden = el.value !== 'admin'; f.querySelector('[data-role-other]').hidden = el.value === 'admin'; }
+  else if (el.dataset.change === 'role') { db.ui.role = +el.value; if (db.ui.company !== 'all' && !myCompanies().includes(db.ui.company)) db.ui.company = 'all'; st.revealed = {}; st.modal = null; if (st.detail && !inScope(asset(st.detail).company)) st.detail = null; if (st.page === 'novo' && !canWrite()) location.hash = 'painel'; render(); toast(`Sessão ativa: ${uname(me())} (${ROLE_LABEL[me().role]}).`); }
+  else if (el.dataset.nf) { const f = newForm(); if (el.type === 'checkbox') f[el.dataset.nf] = el.checked; else { f[el.dataset.nf] = el.dataset.nf === 'company' ? +el.value : el.value; if (el.dataset.nf === 'company') f.location = ''; } render(); }
+});
+document.addEventListener('submit', e => { e.preventDefault(); const fn = forms[e.target.dataset.form]; if (fn) fn(new FormData(e.target)); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Tab' && e.target.id === 'imp-text') { e.preventDefault(); const t = e.target, a = t.selectionStart; t.value = t.value.slice(0, a) + '\t' + t.value.slice(t.selectionEnd); t.selectionStart = t.selectionEnd = a + 1; impState().text = t.value; }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && (st.modal || st.menu)) { st.modal = null; st.menu = null; render(); } });
+window.addEventListener('hashchange', route);
+route();
+})();
+</script>
+</body>
+</html>

@@ -1,5 +1,11 @@
 # Inventário IT
 
+**Português** · [English](README.en.md)
+
+> **Estado: em desenvolvimento.** A base de dados, a API, a importação, o login e a gestão de empresas e logins estão feitos, mas os ecrãs de gestão do dia a dia (listas de assets, linhas, impressoras…) ainda não. Ainda não está pronto para produção. Vê o [Estado do projeto](#estado-do-projeto).
+
+Há uma **demonstração** que corre só no browser, com dados fictícios, em [`demo/index.html`](demo/index.html): abre o ficheiro no browser (ou publica-o com GitHub Pages) para experimentar os ecrãs. Os dados ficam guardados só nesse browser.
+
 Aplicação web para gerir o equipamento informático de várias empresas: portáteis, monitores, telemóveis, impressoras, servidores, NAS, linhas móveis e acessórios. Cada item pertence a uma empresa, tem histórico completo e pode ser atribuído a uma pessoa, a uma localização ou a outro equipamento.
 
 A API é **compatível com o Snipe-IT**: as rotas, os campos e as respostas são iguais. Scripts e ferramentas feitos para o Snipe-IT (por exemplo o módulo PowerShell SnipeitPS) funcionam só a mudar o URL e o token.
@@ -25,6 +31,8 @@ A API é **compatível com o Snipe-IT**: as rotas, os campos e as respostas são
 - [Estrutura do projeto](#estrutura-do-projeto)
 - [Segurança](#segurança)
 - [Estado do projeto](#estado-do-projeto)
+- [Contribuir](#contribuir)
+- [Licença](#licença)
 
 ## Funcionalidades
 
@@ -523,7 +531,9 @@ Dockerfile              Imagem de produção
 
 - O `.env` não vai para o Git. Guarda a `APP_KEY` à parte: sem ela, o PIN/PUK não se recupera.
 - As passwords ficam guardadas com bcrypt. Os tokens da API ficam guardados como hash.
-- O filtro por empresa é aplicado no servidor e não só na interface.
+- As permissões (Pode mexer / Só consulta) e o acesso de cada token da API são verificados no servidor, em cada pedido, e não só na interface.
+- O PIN/PUK fica cifrado com a `APP_KEY` e cada consulta fica no histórico.
+- Para reportar uma falha de segurança, vê o [SECURITY.md](SECURITY.md).
 - Não guardes passwords de servidores nem de equipamentos na aplicação. Usa um gestor de passwords.
 - Em produção, põe a aplicação atrás de HTTPS (por exemplo Nginx Proxy Manager, Traefik ou Caddy).
 
@@ -543,6 +553,12 @@ Dockerfile              Imagem de produção
 - [x] Recuperar a password por e-mail e convite para novos logins
 - [ ] Login com Microsoft (Entra ID)
 
+## Contribuir
+
+Vê o [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Licença
 
-Uso privado. Todos os direitos reservados.
+[MIT](LICENSE). Podes usar, alterar e distribuir livremente, incluindo para fins comerciais, desde que mantenhas o aviso de licença. O software é fornecido sem garantias.
+
+Snipe-IT é uma marca dos seus autores. Este projeto não tem ligação ao Snipe-IT; apenas segue a mesma API para ser compatível com as ferramentas existentes.
