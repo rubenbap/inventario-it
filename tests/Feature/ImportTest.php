@@ -35,7 +35,7 @@ class ImportTest extends TestCase
         Auth::login($this->admin);
     }
 
-    private function run(bool $commit): array
+    private function runImport(bool $commit): array
     {
         $parsed = app(TabularReader::class)->fromText(self::EXCEL);
         $importer = app(Importer::class);
@@ -54,7 +54,7 @@ class ImportTest extends TestCase
     public function test_pre_visualizacao_nao_grava_nada(): void
     {
         $before = Asset::withoutGlobalScopes()->count();
-        $result = $this->run(false);
+        $result = $this->runImport(false);
 
         $this->assertSame(3, $result['ok']);
         $this->assertSame(1, $result['errors']);
@@ -64,7 +64,7 @@ class ImportTest extends TestCase
     public function test_importa_linhas_telemoveis_e_pessoas_e_anula(): void
     {
         $before = Asset::withoutGlobalScopes()->count();
-        $result = $this->run(true);
+        $result = $this->runImport(true);
 
         $this->assertSame(3 + 2, Asset::withoutGlobalScopes()->count() - $before);
         $phone = Asset::withoutGlobalScopes()->where('serial', '354360411847635')->firstOrFail();
