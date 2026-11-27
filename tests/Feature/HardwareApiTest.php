@@ -31,7 +31,7 @@ class HardwareApiTest extends TestCase
 
     public function test_lista_no_formato_do_snipe_it(): void
     {
-        Sanctum::actingAs($this->admin());
+        Sanctum::actingAs($this->admin(), ['*']);
 
         $this->getJson('/api/v1/hardware?limit=2')
             ->assertOk()
@@ -41,7 +41,7 @@ class HardwareApiTest extends TestCase
 
     public function test_cria_asset_com_tag_automatica_por_empresa(): void
     {
-        Sanctum::actingAs($this->admin());
+        Sanctum::actingAs($this->admin(), ['*']);
         $company = Company::where('code', 'CNT')->first();
         $before = $company->asset_tag_counter;
 
@@ -58,7 +58,7 @@ class HardwareApiTest extends TestCase
 
     public function test_erro_de_validacao_vem_com_http_200_como_no_snipe_it(): void
     {
-        Sanctum::actingAs($this->admin());
+        Sanctum::actingAs($this->admin(), ['*']);
 
         $this->postJson('/api/v1/hardware', ['serial' => 'PF4X1A2B'])
             ->assertOk()
@@ -69,7 +69,7 @@ class HardwareApiTest extends TestCase
 
     public function test_checkout_para_localizacao_e_checkin(): void
     {
-        Sanctum::actingAs($this->admin());
+        Sanctum::actingAs($this->admin(), ['*']);
         $asset = Asset::ready()->first();
         $location = Location::first();
 
@@ -104,7 +104,7 @@ class HardwareApiTest extends TestCase
 
     public function test_pin_puk_cifrados_escondidos_na_lista_e_visiveis_no_detalhe(): void
     {
-        Sanctum::actingAs($this->admin());
+        Sanctum::actingAs($this->admin(), ['*']);
         $line = Asset::where('name', '912 345 601')->firstOrFail();
 
         $this->assertStringNotContainsString('4821', json_encode($line->custom_values));
@@ -129,7 +129,7 @@ class HardwareApiTest extends TestCase
 
     public function test_pin_puk_pela_api_fica_no_historico(): void
     {
-        Sanctum::actingAs($this->admin());
+        Sanctum::actingAs($this->admin(), ['*']);
         $line = Asset::where('name', '912 345 601')->firstOrFail();
 
         $this->getJson("/api/v1/hardware/{$line->id}/pin")->assertOk()->assertJsonPath('pin', '4821');
@@ -141,7 +141,7 @@ class HardwareApiTest extends TestCase
 
     public function test_resumo_por_empresa(): void
     {
-        Sanctum::actingAs($this->admin());
+        Sanctum::actingAs($this->admin(), ['*']);
         $json = $this->getJson('/api/v1/reports/summary')->assertOk()->json();
 
         $this->assertSame(Company::count(), count($json['companies']));
@@ -152,7 +152,7 @@ class HardwareApiTest extends TestCase
 
     public function test_linha_movel_vai_com_o_telemovel(): void
     {
-        Sanctum::actingAs($this->admin());
+        Sanctum::actingAs($this->admin(), ['*']);
         $line = Asset::where('name', '912 345 601')->firstOrFail();
 
         $this->getJson("/api/v1/hardware/{$line->id}")
