@@ -62,7 +62,7 @@ class PasswordResetTest extends TestCase
 
     public function test_admin_cria_login_sem_password_e_a_pessoa_recebe_convite(): void
     {
-        $this->actingAs($this->admin)->post('/acessos', ['first_name' => 'Rita', 'email' => 'rita@example.com', 'role' => 'leitura', 'company_ids' => [\App\Models\Company::firstOrFail()->id]])->assertRedirect('/acessos');
+        $this->actingAs($this->admin)->post('/acessos', ['first_name' => 'Rita', 'email' => 'rita@example.com', 'role' => 'leitura'])->assertRedirect('/acessos');
         Notification::assertSentTo(User::where('email', 'rita@example.com')->firstOrFail(), ResetPassword::class);
     }
 }
