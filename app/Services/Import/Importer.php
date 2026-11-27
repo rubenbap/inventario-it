@@ -51,7 +51,7 @@ class Importer
             'model' => ['Modelo', 'modelo'], 'serial' => ['S/N', 'sn serial'], 'ip' => ['IP', 'ip enderecoip'], 'location' => ['Localização', 'localizacao local bastidor'],
         ]],
         'lines' => ['label' => 'Linhas móveis', 'fields' => [
-            'company' => ['Empresa', 'empresa'], 'tarifario' => ['Tarifário', 'tarifario tarifarios plano'], 'numero' => ['Nº telefone', 'nrtelefone ntelefone numero telefone numerodetelefone'],
+            'company' => ['Empresa', 'empresa'], 'tarifario' => ['Tarifário', 'tarifario tarifarios plano'], 'numero' => ['Nº telefone', 'nrtelefone nrotelefone notelefone ntelefone numtelefone numero telefone numerodetelefone nrtlm ntlm'],
             'nome' => ['Nome', 'nome utilizador colaborador'], 'pinpuk' => ['PIN/PUK', 'pinpuk'], 'pin' => ['PIN', 'pin'], 'puk' => ['PUK', 'puk'],
             'telemovel' => ['Telemóvel', 'telemovel equipamento aparelho modelo'], 'imei' => ['IMEI', 'imei'], 'notas' => ['Data ativação / notas', 'dataativacao ativacao dataactivacao notas observacoes'],
         ]],
